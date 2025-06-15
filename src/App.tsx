@@ -8,6 +8,7 @@ import { AuthProvider, useAuth } from "./hooks/useAuth";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Chat from "./pages/Chat";
+import Onboarding from "./pages/Onboarding";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -42,7 +43,7 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
   }
   
   if (user) {
-    return <Navigate to="/chat" replace />;
+    return <Navigate to="/onboarding" replace />;
   }
   
   return <>{children}</>;
@@ -60,6 +61,11 @@ const AppRoutes = () => {
         <PublicRoute>
           <Auth />
         </PublicRoute>
+      } />
+      <Route path="/onboarding" element={
+        <ProtectedRoute>
+          <Onboarding />
+        </ProtectedRoute>
       } />
       <Route path="/chat" element={
         <ProtectedRoute>
