@@ -35,12 +35,18 @@ const Navigation = () => {
             <a href="#pricing" className="text-gray-700 hover:text-black transition-colors">
               Pricing
             </a>
-            <a href="#" className="text-gray-700 hover:text-black transition-colors">
+            <button 
+              onClick={() => navigate('/about')} 
+              className="text-gray-700 hover:text-black transition-colors"
+            >
               About
-            </a>
-            <a href="#" className="text-gray-700 hover:text-black transition-colors">
+            </button>
+            <button 
+              onClick={() => navigate('/contact')} 
+              className="text-gray-700 hover:text-black transition-colors"
+            >
               Contact
-            </a>
+            </button>
           </div>
 
           {/* Desktop Auth Buttons */}
@@ -85,12 +91,18 @@ const Navigation = () => {
               <a href="#pricing" className="text-gray-700 hover:text-black transition-colors">
                 Pricing
               </a>
-              <a href="#" className="text-gray-700 hover:text-black transition-colors">
+              <button 
+                onClick={() => navigate('/about')} 
+                className="text-gray-700 hover:text-black transition-colors text-left"
+              >
                 About
-              </a>
-              <a href="#" className="text-gray-700 hover:text-black transition-colors">
+              </button>
+              <button 
+                onClick={() => navigate('/contact')} 
+                className="text-gray-700 hover:text-black transition-colors text-left"
+              >
                 Contact
-              </a>
+              </button>
               
               <div className="pt-4 border-t border-gray-200">
                 {user ? (

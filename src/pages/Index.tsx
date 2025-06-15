@@ -1,4 +1,3 @@
-
 import { 
   Zap, 
   MessageSquare, 
@@ -338,10 +337,30 @@ const Index = () => {
             </div>
             
             <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-8">
-              <a href="#" className="text-gray-600 hover:text-black">Privacy Policy</a>
-              <a href="#" className="text-gray-600 hover:text-black">Terms of Service</a>
-              <a href="#" className="text-gray-600 hover:text-black">Support</a>
-              <a href="#" className="text-gray-600 hover:text-black">Contact</a>
+              <button 
+                onClick={() => navigate('/privacy')} 
+                className="text-gray-600 hover:text-black transition-colors"
+              >
+                Privacy Policy
+              </button>
+              <button 
+                onClick={() => navigate('/terms')} 
+                className="text-gray-600 hover:text-black transition-colors"
+              >
+                Terms of Service
+              </button>
+              <button 
+                onClick={() => navigate('/support')} 
+                className="text-gray-600 hover:text-black transition-colors"
+              >
+                Support
+              </button>
+              <button 
+                onClick={() => navigate('/contact')} 
+                className="text-gray-600 hover:text-black transition-colors"
+              >
+                Contact
+              </button>
             </div>
           </div>
           
