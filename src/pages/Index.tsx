@@ -11,6 +11,7 @@ import {
   Star
 } from "lucide-react";
 import Navigation from "../components/Navigation";
+import Logo from "../components/Logo";
 import PremiumCard from "../components/PremiumCard";
 import PremiumButton from "../components/PremiumButton";
 import FeatureCard from "../components/FeatureCard";
