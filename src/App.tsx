@@ -8,7 +8,6 @@ import { AuthProvider, useAuth } from "./hooks/useAuth";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Chat from "./pages/Chat";
-import Settings from "./pages/Settings";
 import Onboarding from "./pages/Onboarding";
 import NotFound from "./pages/NotFound";
 
@@ -71,11 +70,6 @@ const AppRoutes = () => {
       <Route path="/chat" element={
         <ProtectedRoute>
           <Chat />
-        </ProtectedRoute>
-      } />
-      <Route path="/settings" element={
-        <ProtectedRoute>
-          <Settings />
         </ProtectedRoute>
       } />
       <Route path="*" element={<NotFound />} />

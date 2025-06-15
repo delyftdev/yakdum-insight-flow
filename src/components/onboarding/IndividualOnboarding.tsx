@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,7 +7,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
 import { Building2, Link, MessageSquare, TrendingUp, CheckCircle } from 'lucide-react';
-import AccountingSoftwareConnection from './AccountingSoftwareConnection';
 
 interface Props {
   onComplete: () => void;
@@ -25,7 +25,7 @@ const IndividualOnboarding = ({ onComplete }: Props) => {
     annualRevenue: '',
     employees: '',
     challenges: [] as string[],
-    accountingConnected: false
+    ledgerConnected: false
   });
 
   const nextStep = () => {
@@ -38,10 +38,6 @@ const IndividualOnboarding = ({ onComplete }: Props) => {
     if (step > 1) {
       setStep(step - 1);
     }
-  };
-
-  const handleConnectionChange = (connected: boolean) => {
-    setData(prev => ({ ...prev, accountingConnected: connected }));
   };
 
   const handleComplete = async () => {
@@ -137,7 +133,54 @@ const IndividualOnboarding = ({ onComplete }: Props) => {
               <p className="text-gray-600">We'll securely connect to get real-time insights</p>
             </div>
 
-            <AccountingSoftwareConnection onConnectionChange={handleConnectionChange} />
+            <div className="grid gap-4">
+              <Card className="cursor-pointer transition-all border-2 hover:border-delyft-primary hover:shadow-md">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                        <span className="text-green-600 font-bold text-lg">QB</span>
+                      </div>
+                      <div>
+                        <h3 className="font-semibold">QuickBooks Online</h3>
+                        <p className="text-sm text-gray-600">Most popular choice</p>
+                      </div>
+                    </div>
+                    <Button variant="outline" onClick={() => setData(prev => ({ ...prev, ledgerConnected: true }))}>
+                      Connect
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="cursor-pointer transition-all border-2 hover:border-delyft-primary hover:shadow-md">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <span className="text-blue-600 font-bold text-lg">X</span>
+                      </div>
+                      <div>
+                        <h3 className="font-semibold">Xero</h3>
+                        <p className="text-sm text-gray-600">Cloud-based accounting</p>
+                      </div>
+                    </div>
+                    <Button variant="outline" onClick={() => setData(prev => ({ ...prev, ledgerConnected: true }))}>
+                      Connect
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {data.ledgerConnected && (
+              <div className="p-4 bg-green-50 border border-green-200 rounded-lg animate-fade-in">
+                <div className="flex items-center space-x-2 text-green-700">
+                  <CheckCircle className="w-5 h-5" />
+                  <span className="font-medium">Successfully connected!</span>
+                </div>
+              </div>
+            )}
 
             <div className="flex gap-3">
               <Button variant="outline" onClick={prevStep} className="flex-1">
@@ -145,7 +188,7 @@ const IndividualOnboarding = ({ onComplete }: Props) => {
               </Button>
               <Button 
                 onClick={nextStep}
-                disabled={!data.accountingConnected}
+                disabled={!data.ledgerConnected}
                 className="flex-1"
               >
                 Continue

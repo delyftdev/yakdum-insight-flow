@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,7 +7,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
 import { Building2, Users, UserPlus, Palette, Settings, CheckCircle } from 'lucide-react';
-import ClientManagement from './ClientManagement';
 
 interface Props {
   onComplete: () => void;
@@ -27,7 +27,7 @@ const FirmOnboarding = ({ onComplete }: Props) => {
     teamEmails: [''],
     brandColor: '#3b82f6',
     logoUploaded: false,
-    clients: [] as any[]
+    clientsImported: false
   });
 
   const nextStep = () => {
@@ -60,17 +60,6 @@ const FirmOnboarding = ({ onComplete }: Props) => {
         ? prev.services.filter(s => s !== service)
         : [...prev.services, service]
     }));
-  };
-
-  const handleClientsChange = (clients: any[]) => {
-    setData(prev => ({ ...prev, clients }));
-  };
-
-  const getConnectionCount = () => {
-    return data.clients.reduce((total, client) => {
-      const connected = Object.values(client.connections || {}).filter(status => status === 'connected').length;
-      return total + connected;
-    }, 0);
   };
 
   const handleComplete = async () => {
@@ -295,11 +284,51 @@ const FirmOnboarding = ({ onComplete }: Props) => {
               <div className="mx-auto w-16 h-16 bg-gradient-to-r from-delyft-primary to-delyft-secondary rounded-full flex items-center justify-center mb-4">
                 <Settings className="w-8 h-8 text-white" />
               </div>
-              <h2 className="text-2xl font-display font-semibold">Add and connect your clients</h2>
-              <p className="text-gray-600">Set up clients and connect their accounting software</p>
+              <h2 className="text-2xl font-display font-semibold">Import your clients</h2>
+              <p className="text-gray-600">Get started with your existing client base</p>
             </div>
 
-            <ClientManagement onClientsChange={handleClientsChange} />
+            <div className="grid gap-4">
+              <Card className="cursor-pointer transition-all border-2 hover:border-delyft-primary hover:shadow-md">
+                <CardContent className="p-6">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-semibold">Import from CSV</h3>
+                      <Button variant="outline" size="sm">
+                        Upload File
+                      </Button>
+                    </div>
+                    <p className="text-sm text-gray-600">
+                      Upload a CSV file with client names, emails, and contact info
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="cursor-pointer transition-all border-2 hover:border-delyft-primary hover:shadow-md">
+                <CardContent className="p-6">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-semibold">Add manually</h3>
+                      <Button variant="outline" size="sm">
+                        Add Client
+                      </Button>
+                    </div>
+                    <p className="text-sm text-gray-600">
+                      Start fresh and add clients one by one
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Button 
+                variant="ghost" 
+                onClick={() => setData(prev => ({ ...prev, clientsImported: true }))}
+                className="text-delyft-primary"
+              >
+                Skip for now - I'll add clients later
+              </Button>
+            </div>
 
             <div className="flex gap-3">
               <Button variant="outline" onClick={prevStep} className="flex-1">
@@ -307,7 +336,6 @@ const FirmOnboarding = ({ onComplete }: Props) => {
               </Button>
               <Button 
                 onClick={nextStep}
-                disabled={data.clients.length === 0 || getConnectionCount() === 0}
                 className="flex-1"
               >
                 Continue
@@ -333,11 +361,7 @@ const FirmOnboarding = ({ onComplete }: Props) => {
                 <ul className="space-y-2 text-sm text-delyft-gray-700">
                   <li className="flex items-center space-x-2">
                     <CheckCircle className="w-4 h-4 text-green-500" />
-                    <span>Connected {getConnectionCount()} accounting software integration{getConnectionCount() !== 1 ? 's' : ''}</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <CheckCircle className="w-4 h-4 text-green-500" />
-                    <span>Added {data.clients.length} client{data.clients.length !== 1 ? 's' : ''} to your firm</span>
+                    <span>Connect client QuickBooks and Xero accounts</span>
                   </li>
                   <li className="flex items-center space-x-2">
                     <CheckCircle className="w-4 h-4 text-green-500" />
