@@ -1,4 +1,3 @@
-
 import { 
   Zap, 
   MessageSquare, 
@@ -10,6 +9,8 @@ import {
   CheckCircle,
   Star
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
 import Navigation from "../components/Navigation";
 import Logo from "../components/Logo";
 import PremiumCard from "../components/PremiumCard";
@@ -17,6 +18,17 @@ import PremiumButton from "../components/PremiumButton";
 import FeatureCard from "../components/FeatureCard";
 
 const Index = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const handleGetStarted = () => {
+    if (user) {
+      navigate('/chat');
+    } else {
+      navigate('/auth');
+    }
+  };
+
   const features = [
     {
       icon: MessageSquare,
@@ -145,7 +157,7 @@ const Index = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
-              <PremiumButton size="lg" className="group">
+              <PremiumButton size="lg" className="group" onClick={handleGetStarted}>
                 Get Started Free
                 <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
               </PremiumButton>
@@ -281,6 +293,7 @@ const Index = () => {
                 <PremiumButton 
                   variant={tier.popular ? "primary" : "outline"} 
                   className="w-full"
+                  onClick={handleGetStarted}
                 >
                   {tier.price === "Free" ? "Get Started" : "Start Free Trial"}
                 </PremiumButton>
@@ -299,7 +312,12 @@ const Index = () => {
           <p className="text-xl text-white/90 mb-10 max-w-2xl mx-auto">
             Join thousands of businesses already using Delyft.ai to make smarter financial decisions.
           </p>
-          <PremiumButton variant="secondary" size="lg" className="bg-white text-delyft-primary hover:bg-gray-50">
+          <PremiumButton 
+            variant="secondary" 
+            size="lg" 
+            className="bg-white text-delyft-primary hover:bg-gray-50"
+            onClick={handleGetStarted}
+          >
             Start Your Free Trial
             <ArrowRight className="w-5 h-5 ml-2" />
           </PremiumButton>

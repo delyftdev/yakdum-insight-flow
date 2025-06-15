@@ -1,82 +1,121 @@
 
-import { Menu, X } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
+import { Button } from "@/components/ui/button";
+import { Menu, X } from "lucide-react";
 import Logo from "./Logo";
 import PremiumButton from "./PremiumButton";
 
 const Navigation = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  const { user, signOut } = useAuth();
 
-  const navItems = [
-    { label: "Features", href: "#features" },
-    { label: "Pricing", href: "#pricing" },
-    { label: "About", href: "#about" },
-    { label: "Contact", href: "#contact" },
-  ];
+  const handleAuthAction = () => {
+    if (user) {
+      navigate('/chat');
+    } else {
+      navigate('/auth');
+    }
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+  };
 
   return (
-    <nav className="fixed top-0 w-full z-50 glass border-b border-white/20">
-      <div className="container mx-auto px-6 py-4">
-        <div className="flex items-center justify-between">
+    <nav className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-delyft-gray-200">
+      <div className="container mx-auto px-6">
+        <div className="flex items-center justify-between h-20">
           <Logo />
           
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            {navItems.map((item) => (
-              <a
-                key={item.label}
-                href={item.href}
-                className="text-delyft-gray-600 hover:text-delyft-primary transition-colors font-medium"
-              >
-                {item.label}
-              </a>
-            ))}
+            <a href="#features" className="text-delyft-gray-700 hover:text-delyft-primary transition-colors">
+              Features
+            </a>
+            <a href="#pricing" className="text-delyft-gray-700 hover:text-delyft-primary transition-colors">
+              Pricing
+            </a>
+            <a href="#" className="text-delyft-gray-700 hover:text-delyft-primary transition-colors">
+              About
+            </a>
+            <a href="#" className="text-delyft-gray-700 hover:text-delyft-primary transition-colors">
+              Contact
+            </a>
           </div>
 
-          {/* Desktop CTA */}
+          {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center space-x-4">
-            <button className="text-delyft-gray-600 hover:text-delyft-primary font-medium">
-              Sign In
-            </button>
-            <PremiumButton>
-              Get Started Free
-            </PremiumButton>
+            {user ? (
+              <>
+                <Button variant="ghost" onClick={() => navigate('/chat')}>
+                  Dashboard
+                </Button>
+                <Button variant="outline" onClick={handleSignOut}>
+                  Sign Out
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="ghost" onClick={() => navigate('/auth')}>
+                  Sign In
+                </Button>
+                <PremiumButton onClick={handleAuthAction}>
+                  Get Started
+                </PremiumButton>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
           <button
             className="md:hidden"
-            onClick={() => setIsOpen(!isOpen)}
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
-            {isOpen ? (
-              <X className="w-6 h-6 text-delyft-gray-600" />
-            ) : (
-              <Menu className="w-6 h-6 text-delyft-gray-600" />
-            )}
+            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
 
-        {/* Mobile Navigation */}
-        {isOpen && (
-          <div className="md:hidden mt-4 pb-4 border-t border-white/20">
-            <div className="flex flex-col space-y-4 pt-4">
-              {navItems.map((item) => (
-                <a
-                  key={item.label}
-                  href={item.href}
-                  className="text-delyft-gray-600 hover:text-delyft-primary transition-colors font-medium py-2"
-                  onClick={() => setIsOpen(false)}
-                >
-                  {item.label}
-                </a>
-              ))}
-              <div className="flex flex-col space-y-3 pt-4">
-                <button className="text-delyft-gray-600 hover:text-delyft-primary font-medium text-left">
-                  Sign In
-                </button>
-                <PremiumButton className="w-full">
-                  Get Started Free
-                </PremiumButton>
+        {/* Mobile Menu */}
+        {isMenuOpen && (
+          <div className="md:hidden py-4 border-t border-delyft-gray-200">
+            <div className="flex flex-col space-y-4">
+              <a href="#features" className="text-delyft-gray-700 hover:text-delyft-primary transition-colors">
+                Features
+              </a>
+              <a href="#pricing" className="text-delyft-gray-700 hover:text-delyft-primary transition-colors">
+                Pricing
+              </a>
+              <a href="#" className="text-delyft-gray-700 hover:text-delyft-primary transition-colors">
+                About
+              </a>
+              <a href="#" className="text-delyft-gray-700 hover:text-delyft-primary transition-colors">
+                Contact
+              </a>
+              
+              <div className="pt-4 border-t border-delyft-gray-200">
+                {user ? (
+                  <>
+                    <Button variant="ghost" onClick={() => navigate('/chat')} className="w-full mb-2">
+                      Dashboard
+                    </Button>
+                    <Button variant="outline" onClick={handleSignOut} className="w-full">
+                      Sign Out
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button variant="ghost" onClick={() => navigate('/auth')} className="w-full mb-2">
+                      Sign In
+                    </Button>
+                    <PremiumButton onClick={handleAuthAction} className="w-full">
+                      Get Started
+                    </PremiumButton>
+                  </>
+                )}
               </div>
             </div>
           </div>
