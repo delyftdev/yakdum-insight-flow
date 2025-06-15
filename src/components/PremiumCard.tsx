@@ -6,23 +6,18 @@ interface PremiumCardProps {
   children: ReactNode;
   className?: string;
   hover?: boolean;
-  glass?: boolean;
 }
 
 const PremiumCard = ({ 
   children, 
   className = "", 
-  hover = true, 
-  glass = false 
+  hover = true 
 }: PremiumCardProps) => {
   return (
     <div 
       className={cn(
-        "rounded-2xl border transition-all duration-300",
-        glass 
-          ? "glass shadow-premium" 
-          : "bg-gradient-to-br from-white to-delyft-gray-50/30 border-delyft-gray-200/50 shadow-premium",
-        hover && "hover-lift cursor-pointer",
+        "rounded-lg border border-gray-200 bg-white shadow-clean transition-all duration-200",
+        hover && "hover:shadow-clean-lg hover:-translate-y-1",
         className
       )}
     >

@@ -19,13 +19,13 @@ const PremiumButton = ({
   onClick,
   disabled = false
 }: PremiumButtonProps) => {
-  const baseClasses = "inline-flex items-center justify-center font-medium rounded-xl transition-all duration-200 active:scale-98 disabled:opacity-50 disabled:cursor-not-allowed";
+  const baseClasses = "inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed";
   
   const variants = {
-    primary: "bg-gradient-to-r from-delyft-primary to-delyft-secondary text-white shadow-indigo hover:shadow-indigo/40 hover:scale-105",
-    secondary: "bg-delyft-gray-100 text-delyft-gray-900 hover:bg-delyft-gray-200",
-    outline: "border-2 border-delyft-primary text-delyft-primary hover:bg-delyft-primary hover:text-white",
-    ghost: "text-delyft-gray-600 hover:text-delyft-primary hover:bg-delyft-primary/5"
+    primary: "bg-black text-white hover:bg-gray-800 shadow-clean",
+    secondary: "bg-gray-100 text-black hover:bg-gray-200",
+    outline: "border border-gray-200 text-black hover:bg-gray-50",
+    ghost: "text-gray-600 hover:text-black hover:bg-gray-100"
   };
   
   const sizes = {

@@ -5,19 +5,15 @@ import { useAuth } from "../hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import Logo from "./Logo";
-import PremiumButton from "./PremiumButton";
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
 
-  const handleAuthAction = () => {
-    if (user) {
-      navigate('/chat');
-    } else {
-      navigate('/auth');
-    }
+  const handleGetStarted = () => {
+    // Direct to auth page with signup mode
+    navigate('/auth?mode=signup');
   };
 
   const handleSignOut = async () => {
@@ -26,23 +22,23 @@ const Navigation = () => {
   };
 
   return (
-    <nav className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-delyft-gray-200">
+    <nav className="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-md border-b border-gray-200">
       <div className="container mx-auto px-6">
         <div className="flex items-center justify-between h-20">
           <Logo />
           
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <a href="#features" className="text-delyft-gray-700 hover:text-delyft-primary transition-colors">
+            <a href="#features" className="text-gray-700 hover:text-black transition-colors">
               Features
             </a>
-            <a href="#pricing" className="text-delyft-gray-700 hover:text-delyft-primary transition-colors">
+            <a href="#pricing" className="text-gray-700 hover:text-black transition-colors">
               Pricing
             </a>
-            <a href="#" className="text-delyft-gray-700 hover:text-delyft-primary transition-colors">
+            <a href="#" className="text-gray-700 hover:text-black transition-colors">
               About
             </a>
-            <a href="#" className="text-delyft-gray-700 hover:text-delyft-primary transition-colors">
+            <a href="#" className="text-gray-700 hover:text-black transition-colors">
               Contact
             </a>
           </div>
@@ -51,21 +47,21 @@ const Navigation = () => {
           <div className="hidden md:flex items-center space-x-4">
             {user ? (
               <>
-                <Button variant="ghost" onClick={() => navigate('/chat')}>
+                <Button variant="ghost" onClick={() => navigate('/chat')} className="text-black hover:bg-gray-100">
                   Dashboard
                 </Button>
-                <Button variant="outline" onClick={handleSignOut}>
+                <Button variant="outline" onClick={handleSignOut} className="border-gray-200 text-black hover:bg-gray-50">
                   Sign Out
                 </Button>
               </>
             ) : (
               <>
-                <Button variant="ghost" onClick={() => navigate('/auth')}>
+                <Button variant="ghost" onClick={() => navigate('/auth')} className="text-black hover:bg-gray-100">
                   Sign In
                 </Button>
-                <PremiumButton onClick={handleAuthAction}>
+                <Button onClick={handleGetStarted} className="bg-black text-white hover:bg-gray-800">
                   Get Started
-                </PremiumButton>
+                </Button>
               </>
             )}
           </div>
@@ -81,39 +77,39 @@ const Navigation = () => {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-delyft-gray-200">
+          <div className="md:hidden py-4 border-t border-gray-200">
             <div className="flex flex-col space-y-4">
-              <a href="#features" className="text-delyft-gray-700 hover:text-delyft-primary transition-colors">
+              <a href="#features" className="text-gray-700 hover:text-black transition-colors">
                 Features
               </a>
-              <a href="#pricing" className="text-delyft-gray-700 hover:text-delyft-primary transition-colors">
+              <a href="#pricing" className="text-gray-700 hover:text-black transition-colors">
                 Pricing
               </a>
-              <a href="#" className="text-delyft-gray-700 hover:text-delyft-primary transition-colors">
+              <a href="#" className="text-gray-700 hover:text-black transition-colors">
                 About
               </a>
-              <a href="#" className="text-delyft-gray-700 hover:text-delyft-primary transition-colors">
+              <a href="#" className="text-gray-700 hover:text-black transition-colors">
                 Contact
               </a>
               
-              <div className="pt-4 border-t border-delyft-gray-200">
+              <div className="pt-4 border-t border-gray-200">
                 {user ? (
                   <>
-                    <Button variant="ghost" onClick={() => navigate('/chat')} className="w-full mb-2">
+                    <Button variant="ghost" onClick={() => navigate('/chat')} className="w-full mb-2 text-black hover:bg-gray-100">
                       Dashboard
                     </Button>
-                    <Button variant="outline" onClick={handleSignOut} className="w-full">
+                    <Button variant="outline" onClick={handleSignOut} className="w-full border-gray-200 text-black hover:bg-gray-50">
                       Sign Out
                     </Button>
                   </>
                 ) : (
                   <>
-                    <Button variant="ghost" onClick={() => navigate('/auth')} className="w-full mb-2">
+                    <Button variant="ghost" onClick={() => navigate('/auth')} className="w-full mb-2 text-black hover:bg-gray-100">
                       Sign In
                     </Button>
-                    <PremiumButton onClick={handleAuthAction} className="w-full">
+                    <Button onClick={handleGetStarted} className="w-full bg-black text-white hover:bg-gray-800">
                       Get Started
-                    </PremiumButton>
+                    </Button>
                   </>
                 )}
               </div>

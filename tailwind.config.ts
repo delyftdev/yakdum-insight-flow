@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -20,22 +21,23 @@ export default {
 		extend: {
 			fontFamily: {
 				'sans': ['Inter', 'sans-serif'],
-				'display': ['Satoshi', 'Inter', 'sans-serif'],
+				'display': ['Inter', 'sans-serif'],
 			},
 			colors: {
-				// Delyft.ai Brand Colors
-				'delyft': {
-					primary: 'rgb(var(--delyft-primary) / <alpha-value>)',
-					'primary-light': 'rgb(var(--delyft-primary-light) / <alpha-value>)',
-					secondary: 'rgb(var(--delyft-secondary) / <alpha-value>)',
-					success: 'rgb(var(--delyft-success) / <alpha-value>)',
-					warning: 'rgb(var(--delyft-warning) / <alpha-value>)',
-					error: 'rgb(var(--delyft-error) / <alpha-value>)',
-					'gray-50': 'rgb(var(--delyft-gray-50) / <alpha-value>)',
-					'gray-100': 'rgb(var(--delyft-gray-100) / <alpha-value>)',
-					'gray-200': 'rgb(var(--delyft-gray-200) / <alpha-value>)',
-					'gray-600': 'rgb(var(--delyft-gray-600) / <alpha-value>)',
-					'gray-900': 'rgb(var(--delyft-gray-900) / <alpha-value>)',
+				// Yakdum Clean Color System
+				'yakdum': {
+					black: 'rgb(0 0 0)',
+					white: 'rgb(255 255 255)',
+					'gray-50': 'rgb(249 250 251)',
+					'gray-100': 'rgb(243 244 246)',
+					'gray-200': 'rgb(229 231 235)',
+					'gray-300': 'rgb(209 213 219)',
+					'gray-400': 'rgb(156 163 175)',
+					'gray-500': 'rgb(107 114 128)',
+					'gray-600': 'rgb(75 85 99)',
+					'gray-700': 'rgb(55 65 81)',
+					'gray-800': 'rgb(31 41 55)',
+					'gray-900': 'rgb(17 24 39)',
 				},
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
@@ -87,37 +89,28 @@ export default {
 				sm: 'calc(var(--radius) - 4px)'
 			},
 			animation: {
-				'fade-in-up': 'fadeInUp 0.6s ease-out',
-				'float': 'float 6s ease-in-out infinite',
-				'shimmer': 'shimmer 1.5s infinite',
+				'fade-in': 'fadeIn 0.3s ease-out',
+				'fade-in-up': 'fadeInUp 0.4s ease-out',
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out'
 			},
 			keyframes: {
+				fadeIn: {
+					'0%': {
+						opacity: '0'
+					},
+					'100%': {
+						opacity: '1'
+					}
+				},
 				fadeInUp: {
 					'0%': {
 						opacity: '0',
-						transform: 'translateY(30px)'
+						transform: 'translateY(20px)'
 					},
 					'100%': {
 						opacity: '1',
 						transform: 'translateY(0)'
-					}
-				},
-				float: {
-					'0%, 100%': {
-						transform: 'translateY(0px)'
-					},
-					'50%': {
-						transform: 'translateY(-20px)'
-					}
-				},
-				shimmer: {
-					'0%': {
-						'background-position': '-200% 0'
-					},
-					'100%': {
-						'background-position': '200% 0'
 					}
 				},
 				'accordion-down': {

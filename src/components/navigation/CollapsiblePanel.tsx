@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { 
@@ -19,6 +19,7 @@ interface UserProfile {
   first_name: string;
   last_name: string;
   user_type: string;
+  logo_url?: string;
 }
 
 interface Props {
@@ -79,25 +80,29 @@ const CollapsiblePanel = ({ userProfile }: Props) => {
         <CollapsibleTrigger asChild>
           <Button 
             variant="ghost" 
-            className="flex items-center space-x-3 p-3 rounded-lg bg-white/80 backdrop-blur-sm border border-delyft-gray-200 hover:bg-white/90 transition-all"
+            className="flex items-center space-x-3 p-3 rounded-lg bg-white/90 backdrop-blur-sm border border-gray-200 hover:bg-white shadow-clean transition-all"
           >
             <Avatar className="w-8 h-8">
-              <AvatarFallback className="bg-delyft-primary text-white text-sm">
-                {getUserInitials()}
-              </AvatarFallback>
+              {userProfile?.logo_url ? (
+                <AvatarImage src={userProfile.logo_url} alt="Logo" />
+              ) : (
+                <AvatarFallback className="bg-black text-white text-sm">
+                  {getUserInitials()}
+                </AvatarFallback>
+              )}
             </Avatar>
             {userProfile && (
               <div className="flex flex-col items-start">
-                <span className="text-sm font-medium text-delyft-gray-900">
+                <span className="text-sm font-medium text-black">
                   {userProfile.first_name} {userProfile.last_name}
                 </span>
-                <span className="text-xs text-delyft-gray-600">
+                <span className="text-xs text-gray-600">
                   {userProfile.user_type === 'accounting_firm' ? 'Firm' : 'Business'}
                 </span>
               </div>
             )}
             <ChevronRight 
-              className={`w-4 h-4 text-delyft-gray-500 transition-transform ${
+              className={`w-4 h-4 text-gray-500 transition-transform ${
                 isOpen ? 'rotate-90' : ''
               }`} 
             />
@@ -105,16 +110,16 @@ const CollapsiblePanel = ({ userProfile }: Props) => {
         </CollapsibleTrigger>
         
         <CollapsibleContent className="mt-2">
-          <div className="bg-white/95 backdrop-blur-sm border border-delyft-gray-200 rounded-lg shadow-lg p-2 min-w-[200px]">
+          <div className="bg-white/95 backdrop-blur-sm border border-gray-200 rounded-lg shadow-clean-lg p-2 min-w-[200px]">
             {menuItems.map((item, index) => (
               <Button
                 key={index}
                 variant="ghost"
-                className="w-full justify-start text-left p-3 h-auto hover:bg-delyft-gray-100"
+                className="w-full justify-start text-left p-3 h-auto hover:bg-gray-100"
                 onClick={item.onClick}
               >
-                <item.icon className="w-4 h-4 mr-3 text-delyft-gray-600" />
-                <span className="text-sm text-delyft-gray-900">{item.label}</span>
+                <item.icon className="w-4 h-4 mr-3 text-gray-600" />
+                <span className="text-sm text-black">{item.label}</span>
               </Button>
             ))}
           </div>

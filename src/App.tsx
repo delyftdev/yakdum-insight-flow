@@ -10,6 +10,10 @@ import Auth from "./pages/Auth";
 import Chat from "./pages/Chat";
 import Onboarding from "./pages/Onboarding";
 import SetupCompletion from "./pages/SetupCompletion";
+import Profile from "./pages/Profile";
+import Settings from "./pages/Settings";
+import Upgrade from "./pages/Upgrade";
+import Help from "./pages/Help";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -20,7 +24,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-delyft-primary"></div>
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-black"></div>
       </div>
     );
   }
@@ -38,7 +42,7 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-delyft-primary"></div>
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-black"></div>
       </div>
     );
   }
@@ -76,6 +80,26 @@ const AppRoutes = () => {
       <Route path="/setup-completion" element={
         <ProtectedRoute>
           <SetupCompletion />
+        </ProtectedRoute>
+      } />
+      <Route path="/profile" element={
+        <ProtectedRoute>
+          <Profile />
+        </ProtectedRoute>
+      } />
+      <Route path="/settings" element={
+        <ProtectedRoute>
+          <Settings />
+        </ProtectedRoute>
+      } />
+      <Route path="/upgrade" element={
+        <ProtectedRoute>
+          <Upgrade />
+        </ProtectedRoute>
+      } />
+      <Route path="/help" element={
+        <ProtectedRoute>
+          <Help />
         </ProtectedRoute>
       } />
       <Route path="*" element={<NotFound />} />
