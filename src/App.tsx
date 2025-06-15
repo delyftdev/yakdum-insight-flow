@@ -3,121 +3,45 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider, useAuth } from "./hooks/useAuth";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/hooks/useAuth";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Chat from "./pages/Chat";
-import Onboarding from "./pages/Onboarding";
-import SetupCompletion from "./pages/SetupCompletion";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
-import Upgrade from "./pages/Upgrade";
+import SetupCompletion from "./pages/SetupCompletion";
+import Onboarding from "./pages/Onboarding";
 import Help from "./pages/Help";
+import Upgrade from "./pages/Upgrade";
+import OAuthCallback from "./pages/OAuthCallback";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user, loading } = useAuth();
-  
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-black"></div>
-      </div>
-    );
-  }
-  
-  if (!user) {
-    return <Navigate to="/auth" replace />;
-  }
-  
-  return <>{children}</>;
-};
-
-const PublicRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user, loading } = useAuth();
-  
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-black"></div>
-      </div>
-    );
-  }
-  
-  if (user) {
-    return <Navigate to="/onboarding" replace />;
-  }
-  
-  return <>{children}</>;
-};
-
-const AppRoutes = () => {
-  return (
-    <Routes>
-      <Route path="/" element={
-        <PublicRoute>
-          <Index />
-        </PublicRoute>
-      } />
-      <Route path="/auth" element={
-        <PublicRoute>
-          <Auth />
-        </PublicRoute>
-      } />
-      <Route path="/onboarding" element={
-        <ProtectedRoute>
-          <Onboarding />
-        </ProtectedRoute>
-      } />
-      <Route path="/chat" element={
-        <ProtectedRoute>
-          <Chat />
-        </ProtectedRoute>
-      } />
-      <Route path="/setup-completion" element={
-        <ProtectedRoute>
-          <SetupCompletion />
-        </ProtectedRoute>
-      } />
-      <Route path="/profile" element={
-        <ProtectedRoute>
-          <Profile />
-        </ProtectedRoute>
-      } />
-      <Route path="/settings" element={
-        <ProtectedRoute>
-          <Settings />
-        </ProtectedRoute>
-      } />
-      <Route path="/upgrade" element={
-        <ProtectedRoute>
-          <Upgrade />
-        </ProtectedRoute>
-      } />
-      <Route path="/help" element={
-        <ProtectedRoute>
-          <Help />
-        </ProtectedRoute>
-      } />
-      <Route path="*" element={<NotFound />} />
-    </Routes>
-  );
-};
-
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <AuthProvider>
+    <AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
         <BrowserRouter>
-          <AppRoutes />
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/chat" element={<Chat />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/setup-completion" element={<SetupCompletion />} />
+            <Route path="/onboarding" element={<Onboarding />} />
+            <Route path="/help" element={<Help />} />
+            <Route path="/upgrade" element={<Upgrade />} />
+            <Route path="/oauth/callback" element={<OAuthCallback />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
         </BrowserRouter>
-      </AuthProvider>
-    </TooltipProvider>
+      </TooltipProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 

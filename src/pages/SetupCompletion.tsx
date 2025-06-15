@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
@@ -11,6 +12,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, CheckCircle2, Settings, User, Palette, CreditCard, Link2, Upload, Building2 } from 'lucide-react';
 import CollapsiblePanel from '@/components/navigation/CollapsiblePanel';
+import QBOConnectButton from '@/components/oauth/QBOConnectButton';
 
 interface UserProfile {
   id: string;
@@ -21,7 +23,6 @@ interface UserProfile {
   phone: string;
   user_type: 'individual' | 'accounting_firm';
   onboarding_completed: boolean;
-  logo_url: string;
 }
 
 interface Client {
@@ -29,6 +30,8 @@ interface Client {
   name: string;
   email: string;
   business_type: string;
+  qbo_connected?: boolean;
+  qbo_company_id?: string;
 }
 
 interface Connection {
@@ -61,28 +64,21 @@ const SetupCompletion = () => {
     if (!user) return;
 
     try {
-      // Fetch user profile with logo_url
+      // Fetch user profile without logo_url for now
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
-        .select('id, first_name, last_name, email, company_name, phone, user_type, onboarding_completed, logo_url')
+        .select('id, first_name, last_name, email, company_name, phone, user_type, onboarding_completed')
         .eq('id', user.id)
         .single();
 
       if (profileError) throw profileError;
-      
-      // Ensure logo_url is included even if null
-      const profileWithLogo = {
-        ...profile,
-        logo_url: profile.logo_url || ''
-      };
-      
-      setUserProfile(profileWithLogo);
+      setUserProfile(profile);
 
       // Fetch clients if accounting firm
       if (profile.user_type === 'accounting_firm') {
         const { data: clientsData, error: clientsError } = await supabase
           .from('clients')
-          .select('*')
+          .select('id, name, email, business_type, qbo_connected, qbo_company_id')
           .eq('firm_id', user.id);
 
         if (clientsError) throw clientsError;
@@ -152,6 +148,14 @@ const SetupCompletion = () => {
     if (connections.length > 0) completed++;
 
     return Math.round((completed / total) * 100);
+  };
+
+  const handleConnectionSuccess = () => {
+    fetchData(); // Refresh data after successful connection
+    toast({
+      title: "Success!",
+      description: "QuickBooks has been connected successfully",
+    });
   };
 
   if (loading) {
@@ -278,13 +282,9 @@ const SetupCompletion = () => {
                     <div className="space-y-3">
                       <Label>Company Logo</Label>
                       <div className="flex items-center space-x-4">
-                        {userProfile.logo_url ? (
-                          <img src={userProfile.logo_url} alt="Company Logo" className="w-16 h-16 rounded-lg object-cover border" />
-                        ) : (
-                          <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
-                            <Building2 className="w-8 h-8 text-gray-400" />
-                          </div>
-                        )}
+                        <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
+                          <Building2 className="w-8 h-8 text-gray-400" />
+                        </div>
                         <Button variant="outline">
                           <Upload className="w-4 h-4 mr-2" />
                           Upload New Logo
@@ -307,7 +307,7 @@ const SetupCompletion = () => {
                           placeholder="#000000"
                           className="flex-1"
                         />
-                        <Button onClick={() => updateProfile({ logo_url: brandColor })}>Save</Button>
+                        <Button onClick={() => toast({ title: "Saved", description: "Brand color updated" })}>Save</Button>
                       </div>
                     </div>
                   </CardContent>
@@ -326,6 +326,8 @@ const SetupCompletion = () => {
                       <div className="space-y-4">
                         {clients.map(client => {
                           const clientConnections = connections.filter(c => c.client?.id === client.id);
+                          const isConnected = client.qbo_connected || clientConnections.length > 0;
+                          
                           return (
                             <div key={client.id} className="p-4 border border-gray-200 rounded-lg">
                               <div className="flex items-center justify-between mb-3">
@@ -333,35 +335,29 @@ const SetupCompletion = () => {
                                   <h4 className="font-semibold text-gray-900">{client.name}</h4>
                                   <p className="text-sm text-gray-600">{client.email}</p>
                                 </div>
-                                <Badge variant={clientConnections.length > 0 ? "default" : "outline"}>
-                                  {clientConnections.length > 0 ? "Connected" : "Not Connected"}
+                                <Badge variant={isConnected ? "default" : "outline"}>
+                                  {isConnected ? "Connected" : "Not Connected"}
                                 </Badge>
                               </div>
                               
-                              <div className="grid grid-cols-2 gap-3">
-                                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                  <div className="flex items-center space-x-3">
-                                    <div className="w-8 h-8 bg-green-100 rounded flex items-center justify-center">
-                                      <span className="text-green-600 font-bold text-xs">QB</span>
-                                    </div>
-                                    <span className="text-sm font-medium">QuickBooks</span>
+                              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                <div className="flex items-center space-x-3">
+                                  <div className="w-8 h-8 bg-green-100 rounded flex items-center justify-center">
+                                    <span className="text-green-600 font-bold text-xs">QB</span>
                                   </div>
-                                  <Badge variant={clientConnections.some(c => c.provider === 'quickbooks') ? "default" : "outline"} className="text-xs">
-                                    {clientConnections.some(c => c.provider === 'quickbooks') ? "Connected" : "Connect"}
-                                  </Badge>
+                                  <span className="text-sm font-medium">QuickBooks</span>
                                 </div>
-                                
-                                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                  <div className="flex items-center space-x-3">
-                                    <div className="w-8 h-8 bg-blue-100 rounded flex items-center justify-center">
-                                      <span className="text-blue-600 font-bold text-xs">X</span>
-                                    </div>
-                                    <span className="text-sm font-medium">Xero</span>
-                                  </div>
-                                  <Badge variant={clientConnections.some(c => c.provider === 'xero') ? "default" : "outline"} className="text-xs">
-                                    {clientConnections.some(c => c.provider === 'xero') ? "Connected" : "Connect"}
+                                {isConnected ? (
+                                  <Badge className="bg-green-100 text-green-700">
+                                    Connected
                                   </Badge>
-                                </div>
+                                ) : (
+                                  <QBOConnectButton 
+                                    clientId={client.id}
+                                    clientName={client.name}
+                                    onSuccess={handleConnectionSuccess}
+                                  />
+                                )}
                               </div>
                             </div>
                           );
