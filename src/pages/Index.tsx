@@ -1,12 +1,335 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import { 
+  Zap, 
+  MessageSquare, 
+  BarChart3, 
+  Shield, 
+  Users, 
+  Sparkles,
+  ArrowRight,
+  CheckCircle,
+  Star
+} from "lucide-react";
+import Navigation from "../components/Navigation";
+import PremiumCard from "../components/PremiumCard";
+import PremiumButton from "../components/PremiumButton";
+import FeatureCard from "../components/FeatureCard";
 
 const Index = () => {
+  const features = [
+    {
+      icon: MessageSquare,
+      title: "Natural Language Queries",
+      description: "Ask questions about your finances in plain English and get instant, accurate answers.",
+      gradient: "from-delyft-primary to-blue-600"
+    },
+    {
+      icon: BarChart3,
+      title: "Real-time Insights",
+      description: "Connect QuickBooks or Xero for live data analysis with sophisticated visualizations.",
+      gradient: "from-delyft-secondary to-green-600"
+    },
+    {
+      icon: Sparkles,
+      title: "AI-Powered Analytics",
+      description: "Advanced AI processes your data to uncover trends, patterns, and actionable insights.",
+      gradient: "from-purple-500 to-pink-600"
+    },
+    {
+      icon: Shield,
+      title: "Bank-Level Security",
+      description: "Your financial data is protected with enterprise-grade encryption and security.",
+      gradient: "from-delyft-warning to-orange-600"
+    },
+    {
+      icon: Users,
+      title: "Team Collaboration",
+      description: "Share insights, reports, and collaborate with your team and accountants seamlessly.",
+      gradient: "from-indigo-500 to-delyft-primary"
+    },
+    {
+      icon: Zap,
+      title: "Instant Processing",
+      description: "Get answers in seconds, not hours. Our AI processes complex queries lightning fast.",
+      gradient: "from-delyft-secondary to-teal-700"
+    }
+  ];
+
+  const testimonials = [
+    {
+      name: "Sarah Chen",
+      role: "CFO, TechCorp",
+      content: "Delyft.ai has transformed how we analyze our financials. What used to take hours now takes minutes.",
+      avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face"
+    },
+    {
+      name: "Michael Rodriguez",
+      role: "Accounting Partner",
+      content: "Our clients love the instant insights. It's revolutionized our advisory services.",
+      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face"
+    },
+    {
+      name: "Emily Johnson",
+      role: "Small Business Owner",
+      content: "Finally, accounting insights I can actually understand and act on immediately.",
+      avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face"
+    }
+  ];
+
+  const pricingTiers = [
+    {
+      name: "Starter",
+      price: "Free",
+      description: "Perfect for small businesses getting started",
+      features: [
+        "1 accounting connection",
+        "50 queries per month",
+        "Basic insights & reports",
+        "Email support"
+      ],
+      popular: false
+    },
+    {
+      name: "Professional",
+      price: "$49",
+      description: "Ideal for growing businesses and teams",
+      features: [
+        "5 accounting connections",
+        "500 queries per month",
+        "Advanced AI insights",
+        "Team collaboration",
+        "Priority support",
+        "Custom reports"
+      ],
+      popular: true
+    },
+    {
+      name: "Enterprise",
+      price: "$149",
+      description: "For large organizations and accounting firms",
+      features: [
+        "Unlimited connections",
+        "Unlimited queries",
+        "White-label solution",
+        "Advanced integrations",
+        "Dedicated success manager",
+        "Custom AI training"
+      ],
+      popular: false
+    }
+  ];
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-delyft-gray-50 via-white to-delyft-primary-light/20">
+      <Navigation />
+      
+      {/* Hero Section */}
+      <section className="pt-32 pb-20 px-6">
+        <div className="container mx-auto text-center">
+          <div className="animate-fade-in-up">
+            <span className="inline-flex items-center px-4 py-2 rounded-full bg-delyft-primary/10 text-delyft-primary font-medium text-sm mb-8">
+              <Sparkles className="w-4 h-4 mr-2" />
+              AI-Powered Accounting Insights
+            </span>
+            
+            <h1 className="text-5xl md:text-7xl font-bold font-display mb-6 leading-tight">
+              <span className="gradient-text">AI-powered</span><br />
+              accounting insights<br />
+              <span className="text-delyft-gray-900">that work for you</span>
+            </h1>
+            
+            <p className="text-xl text-delyft-gray-600 mb-10 max-w-3xl mx-auto leading-relaxed">
+              Connect QuickBooks Online or Xero and ask natural language questions to receive 
+              real-time AI-backed insights with sophisticated processing visualization.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
+              <PremiumButton size="lg" className="group">
+                Get Started Free
+                <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+              </PremiumButton>
+              <PremiumButton variant="outline" size="lg">
+                Watch Demo
+              </PremiumButton>
+            </div>
+            
+            <div className="flex items-center justify-center space-x-8 text-sm text-delyft-gray-500">
+              <div className="flex items-center">
+                <CheckCircle className="w-4 h-4 text-delyft-success mr-2" />
+                No credit card required
+              </div>
+              <div className="flex items-center">
+                <CheckCircle className="w-4 h-4 text-delyft-success mr-2" />
+                2-minute setup
+              </div>
+              <div className="flex items-center">
+                <CheckCircle className="w-4 h-4 text-delyft-success mr-2" />
+                Bank-level security
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section id="features" className="py-20 px-6">
+        <div className="container mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold font-display text-delyft-gray-900 mb-6">
+              Powerful features for modern accounting
+            </h2>
+            <p className="text-xl text-delyft-gray-600 max-w-2xl mx-auto">
+              Everything you need to transform your financial data into actionable business insights
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {features.map((feature, index) => (
+              <div key={index} className="animate-fade-in-up" style={{ animationDelay: `${index * 100}ms` }}>
+                <FeatureCard {...feature} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Social Proof Section */}
+      <section className="py-20 px-6 bg-gradient-to-r from-delyft-primary/5 to-delyft-secondary/5">
+        <div className="container mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold font-display text-delyft-gray-900 mb-6">
+              Trusted by finance professionals
+            </h2>
+            <div className="flex items-center justify-center mb-8">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} className="w-6 h-6 text-delyft-warning fill-current" />
+              ))}
+              <span className="ml-3 text-delyft-gray-600 font-medium">4.9/5 from 2,000+ users</span>
+            </div>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            {testimonials.map((testimonial, index) => (
+              <PremiumCard key={index} className="p-8">
+                <div className="flex items-center mb-6">
+                  <img 
+                    src={testimonial.avatar} 
+                    alt={testimonial.name}
+                    className="w-12 h-12 rounded-full mr-4"
+                  />
+                  <div>
+                    <h4 className="font-semibold text-delyft-gray-900">{testimonial.name}</h4>
+                    <p className="text-sm text-delyft-gray-600">{testimonial.role}</p>
+                  </div>
+                </div>
+                <p className="text-delyft-gray-700 italic leading-relaxed">
+                  "{testimonial.content}"
+                </p>
+              </PremiumCard>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Section */}
+      <section id="pricing" className="py-20 px-6">
+        <div className="container mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold font-display text-delyft-gray-900 mb-6">
+              Simple, transparent pricing
+            </h2>
+            <p className="text-xl text-delyft-gray-600 max-w-2xl mx-auto">
+              Choose the plan that fits your business needs. Upgrade or downgrade at any time.
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            {pricingTiers.map((tier, index) => (
+              <PremiumCard 
+                key={index} 
+                className={`p-8 relative ${tier.popular ? 'ring-2 ring-delyft-primary' : ''}`}
+              >
+                {tier.popular && (
+                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                    <span className="bg-gradient-to-r from-delyft-primary to-delyft-secondary text-white px-4 py-1 rounded-full text-sm font-medium">
+                      Most Popular
+                    </span>
+                  </div>
+                )}
+                
+                <div className="text-center mb-8">
+                  <h3 className="text-2xl font-bold font-display text-delyft-gray-900 mb-2">
+                    {tier.name}
+                  </h3>
+                  <p className="text-delyft-gray-600 mb-4">{tier.description}</p>
+                  <div className="mb-6">
+                    <span className="text-4xl font-bold text-delyft-gray-900">{tier.price}</span>
+                    {tier.price !== "Free" && <span className="text-delyft-gray-600">/month</span>}
+                  </div>
+                </div>
+                
+                <ul className="space-y-4 mb-8">
+                  {tier.features.map((feature, featureIndex) => (
+                    <li key={featureIndex} className="flex items-center">
+                      <CheckCircle className="w-5 h-5 text-delyft-success mr-3 flex-shrink-0" />
+                      <span className="text-delyft-gray-700">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+                
+                <PremiumButton 
+                  variant={tier.popular ? "primary" : "outline"} 
+                  className="w-full"
+                >
+                  {tier.price === "Free" ? "Get Started" : "Start Free Trial"}
+                </PremiumButton>
+              </PremiumCard>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 px-6 bg-gradient-to-r from-delyft-primary to-delyft-secondary">
+        <div className="container mx-auto text-center">
+          <h2 className="text-4xl font-bold font-display text-white mb-6">
+            Ready to transform your accounting insights?
+          </h2>
+          <p className="text-xl text-white/90 mb-10 max-w-2xl mx-auto">
+            Join thousands of businesses already using Delyft.ai to make smarter financial decisions.
+          </p>
+          <PremiumButton variant="secondary" size="lg" className="bg-white text-delyft-primary hover:bg-gray-50">
+            Start Your Free Trial
+            <ArrowRight className="w-5 h-5 ml-2" />
+          </PremiumButton>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-12 px-6 border-t border-delyft-gray-200">
+        <div className="container mx-auto">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <div className="mb-6 md:mb-0">
+              <Logo />
+              <p className="text-delyft-gray-600 mt-4 max-w-md">
+                AI-powered accounting insights that work for you. Connect, ask, and discover 
+                financial insights in seconds.
+              </p>
+            </div>
+            
+            <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-8">
+              <a href="#" className="text-delyft-gray-600 hover:text-delyft-primary">Privacy Policy</a>
+              <a href="#" className="text-delyft-gray-600 hover:text-delyft-primary">Terms of Service</a>
+              <a href="#" className="text-delyft-gray-600 hover:text-delyft-primary">Support</a>
+              <a href="#" className="text-delyft-gray-600 hover:text-delyft-primary">Contact</a>
+            </div>
+          </div>
+          
+          <div className="border-t border-delyft-gray-200 mt-8 pt-8 text-center text-delyft-gray-600">
+            <p>&copy; 2024 Delyft.ai. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
