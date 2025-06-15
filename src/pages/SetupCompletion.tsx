@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
@@ -10,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, CheckCircle2, Settings, User, Palette, CreditCard, Link2, Upload, Building2 } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, User, Palette, CreditCard, Link2, Upload, Building2, Trash2, AlertTriangle } from 'lucide-react';
 import CollapsiblePanel from '@/components/navigation/CollapsiblePanel';
 import QBOConnectButton from '@/components/oauth/QBOConnectButton';
 
@@ -30,8 +29,6 @@ interface Client {
   name: string;
   email: string;
   business_type: string;
-  qbo_connected?: boolean;
-  qbo_company_id?: string;
 }
 
 interface Connection {
@@ -64,7 +61,7 @@ const SetupCompletion = () => {
     if (!user) return;
 
     try {
-      // Fetch user profile without logo_url for now
+      // Fetch user profile
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('id, first_name, last_name, email, company_name, phone, user_type, onboarding_completed')
@@ -74,11 +71,11 @@ const SetupCompletion = () => {
       if (profileError) throw profileError;
       setUserProfile(profile);
 
-      // Fetch clients if accounting firm
+      // Fetch clients if accounting firm - only select existing columns
       if (profile.user_type === 'accounting_firm') {
         const { data: clientsData, error: clientsError } = await supabase
           .from('clients')
-          .select('id, name, email, business_type, qbo_connected, qbo_company_id')
+          .select('id, name, email, business_type')
           .eq('firm_id', user.id);
 
         if (clientsError) throw clientsError;
@@ -133,6 +130,40 @@ const SetupCompletion = () => {
         variant: "destructive"
       });
     }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!user) return;
+    
+    const confirmed = window.confirm(
+      "Are you sure you want to delete your account? This action cannot be undone and will permanently delete all your data."
+    );
+    
+    if (!confirmed) return;
+
+    try {
+      const { error } = await supabase.auth.admin.deleteUser(user.id);
+      if (error) throw error;
+      
+      toast({
+        title: "Account Deleted",
+        description: "Your account has been successfully deleted"
+      });
+      
+      navigate('/auth');
+    } catch (error) {
+      console.error('Error deleting account:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete account",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleAddPaymentMethod = () => {
+    // For now, redirect to upgrade page which will handle Stripe integration
+    navigate('/upgrade');
   };
 
   const getCompletionPercentage = () => {
@@ -191,7 +222,7 @@ const SetupCompletion = () => {
           </div>
 
           <Tabs defaultValue="profile" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-5">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="profile" className="flex items-center space-x-2">
                 <User className="w-4 h-4" />
                 <span>Profile</span>
@@ -199,10 +230,6 @@ const SetupCompletion = () => {
               <TabsTrigger value="appearance">
                 <Palette className="w-4 h-4 mr-2" />
                 Appearance
-              </TabsTrigger>
-              <TabsTrigger value="account">
-                <Settings className="w-4 h-4 mr-2" />
-                Account
               </TabsTrigger>
               <TabsTrigger value="billing">
                 <CreditCard className="w-4 h-4 mr-2" />
@@ -215,61 +242,91 @@ const SetupCompletion = () => {
             </TabsList>
 
             <TabsContent value="profile">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Profile Information</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Profile Information</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="firstName">First Name</Label>
+                        <Input
+                          id="firstName"
+                          value={userProfile.first_name || ''}
+                          onChange={(e) => setUserProfile(prev => prev ? {...prev, first_name: e.target.value} : null)}
+                          onBlur={(e) => updateProfile({ first_name: e.target.value })}
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="lastName">Last Name</Label>
+                        <Input
+                          id="lastName"
+                          value={userProfile.last_name || ''}
+                          onChange={(e) => setUserProfile(prev => prev ? {...prev, last_name: e.target.value} : null)}
+                          onBlur={(e) => updateProfile({ last_name: e.target.value })}
+                        />
+                      </div>
+                    </div>
                     <div>
-                      <Label htmlFor="firstName">First Name</Label>
+                      <Label htmlFor="email">Email</Label>
                       <Input
-                        id="firstName"
-                        value={userProfile.first_name || ''}
-                        onChange={(e) => setUserProfile(prev => prev ? {...prev, first_name: e.target.value} : null)}
-                        onBlur={(e) => updateProfile({ first_name: e.target.value })}
+                        id="email"
+                        type="email"
+                        value={userProfile.email || ''}
+                        disabled
+                        className="bg-gray-50"
                       />
                     </div>
                     <div>
-                      <Label htmlFor="lastName">Last Name</Label>
+                      <Label htmlFor="company">Company Name</Label>
                       <Input
-                        id="lastName"
-                        value={userProfile.last_name || ''}
-                        onChange={(e) => setUserProfile(prev => prev ? {...prev, last_name: e.target.value} : null)}
-                        onBlur={(e) => updateProfile({ last_name: e.target.value })}
+                        id="company"
+                        value={userProfile.company_name || ''}
+                        onChange={(e) => setUserProfile(prev => prev ? {...prev, company_name: e.target.value} : null)}
+                        onBlur={(e) => updateProfile({ company_name: e.target.value })}
                       />
                     </div>
-                  </div>
-                  <div>
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={userProfile.email || ''}
-                      disabled
-                      className="bg-gray-50"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="company">Company Name</Label>
-                    <Input
-                      id="company"
-                      value={userProfile.company_name || ''}
-                      onChange={(e) => setUserProfile(prev => prev ? {...prev, company_name: e.target.value} : null)}
-                      onBlur={(e) => updateProfile({ company_name: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="phone">Phone</Label>
-                    <Input
-                      id="phone"
-                      value={userProfile.phone || ''}
-                      onChange={(e) => setUserProfile(prev => prev ? {...prev, phone: e.target.value} : null)}
-                      onBlur={(e) => updateProfile({ phone: e.target.value })}
-                    />
-                  </div>
-                </CardContent>
-              </Card>
+                    <div>
+                      <Label htmlFor="phone">Phone</Label>
+                      <Input
+                        id="phone"
+                        value={userProfile.phone || ''}
+                        onChange={(e) => setUserProfile(prev => prev ? {...prev, phone: e.target.value} : null)}
+                        onBlur={(e) => updateProfile({ phone: e.target.value })}
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Delete Account Section */}
+                <Card className="border-red-200">
+                  <CardHeader>
+                    <CardTitle className="text-red-600 flex items-center">
+                      <AlertTriangle className="w-5 h-5 mr-2" />
+                      Danger Zone
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-medium text-gray-900">Delete Account</h4>
+                        <p className="text-sm text-gray-600">
+                          Permanently delete your account and all associated data. This action cannot be undone.
+                        </p>
+                      </div>
+                      <Button 
+                        variant="destructive" 
+                        onClick={handleDeleteAccount}
+                        className="flex items-center space-x-2"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        <span>Delete Account</span>
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             </TabsContent>
 
             <TabsContent value="appearance">
@@ -315,18 +372,40 @@ const SetupCompletion = () => {
               </div>
             </TabsContent>
 
+            <TabsContent value="billing">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Billing & Subscription</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between p-4 border rounded-lg">
+                    <div>
+                      <h3 className="font-semibold">Payment Method</h3>
+                      <p className="text-sm text-gray-600">Add a payment method to enable premium features</p>
+                    </div>
+                    <Button onClick={handleAddPaymentMethod}>
+                      Add Payment Method
+                    </Button>
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    Secure payments powered by Stripe
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
             <TabsContent value="integrations">
               <div className="space-y-6">
                 {userProfile.user_type === 'accounting_firm' && clients.length > 0 ? (
                   <Card>
                     <CardHeader>
-                      <CardTitle>Client Ledger Connections</CardTitle>
+                      <CardTitle>Client Accounting Software Connections</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-4">
                         {clients.map(client => {
                           const clientConnections = connections.filter(c => c.client?.id === client.id);
-                          const isConnected = client.qbo_connected || clientConnections.length > 0;
+                          const qboConnected = clientConnections.some(c => c.provider === 'quickbooks' && c.status === 'connected');
                           
                           return (
                             <div key={client.id} className="p-4 border border-gray-200 rounded-lg">
@@ -335,29 +414,42 @@ const SetupCompletion = () => {
                                   <h4 className="font-semibold text-gray-900">{client.name}</h4>
                                   <p className="text-sm text-gray-600">{client.email}</p>
                                 </div>
-                                <Badge variant={isConnected ? "default" : "outline"}>
-                                  {isConnected ? "Connected" : "Not Connected"}
-                                </Badge>
                               </div>
                               
-                              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                <div className="flex items-center space-x-3">
-                                  <div className="w-8 h-8 bg-green-100 rounded flex items-center justify-center">
-                                    <span className="text-green-600 font-bold text-xs">QB</span>
+                              <div className="space-y-3">
+                                {/* QuickBooks Online */}
+                                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                  <div className="flex items-center space-x-3">
+                                    <div className="w-8 h-8 bg-green-100 rounded flex items-center justify-center">
+                                      <span className="text-green-600 font-bold text-xs">QB</span>
+                                    </div>
+                                    <span className="text-sm font-medium">QuickBooks Online</span>
                                   </div>
-                                  <span className="text-sm font-medium">QuickBooks</span>
+                                  {qboConnected ? (
+                                    <Badge className="bg-green-100 text-green-700">
+                                      Connected
+                                    </Badge>
+                                  ) : (
+                                    <QBOConnectButton 
+                                      clientId={client.id}
+                                      clientName={client.name}
+                                      onSuccess={handleConnectionSuccess}
+                                    />
+                                  )}
                                 </div>
-                                {isConnected ? (
-                                  <Badge className="bg-green-100 text-green-700">
-                                    Connected
+
+                                {/* Xero - Coming Soon */}
+                                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg opacity-50">
+                                  <div className="flex items-center space-x-3">
+                                    <div className="w-8 h-8 bg-blue-100 rounded flex items-center justify-center">
+                                      <span className="text-blue-600 font-bold text-xs">X</span>
+                                    </div>
+                                    <span className="text-sm font-medium">Xero</span>
+                                  </div>
+                                  <Badge variant="secondary">
+                                    Coming Soon
                                   </Badge>
-                                ) : (
-                                  <QBOConnectButton 
-                                    clientId={client.id}
-                                    clientName={client.name}
-                                    onSuccess={handleConnectionSuccess}
-                                  />
-                                )}
+                                </div>
                               </div>
                             </div>
                           );
@@ -372,7 +464,7 @@ const SetupCompletion = () => {
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-4">
-                        {/* QuickBooks Online */}
+                        {/* QuickBooks Online for Individual */}
                         <div className="flex items-center justify-between p-4 border rounded-lg">
                           <div className="flex items-center space-x-4">
                             <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
@@ -389,16 +481,17 @@ const SetupCompletion = () => {
                                 Connected
                               </Badge>
                             ) : (
-                              <Badge variant="outline">Disconnected</Badge>
+                              <QBOConnectButton 
+                                clientId={userProfile.id}
+                                clientName="Your Business"
+                                onSuccess={handleConnectionSuccess}
+                              />
                             )}
-                            <Button variant="outline" size="sm">
-                              {connections.some(c => c.provider === 'quickbooks' && c.status === 'connected') ? 'Reconnect' : 'Connect'}
-                            </Button>
                           </div>
                         </div>
 
-                        {/* Xero */}
-                        <div className="flex items-center justify-between p-4 border rounded-lg">
+                        {/* Xero - Coming Soon */}
+                        <div className="flex items-center justify-between p-4 border rounded-lg opacity-50">
                           <div className="flex items-center space-x-4">
                             <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
                               <span className="text-blue-600 font-bold">X</span>
@@ -408,46 +501,15 @@ const SetupCompletion = () => {
                               <p className="text-sm text-gray-600">Beautiful business accounting</p>
                             </div>
                           </div>
-                          <div className="flex items-center space-x-3">
-                            {connections.some(c => c.provider === 'xero' && c.status === 'connected') ? (
-                              <Badge className="bg-green-100 text-green-700">
-                                Connected
-                              </Badge>
-                            ) : (
-                              <Badge variant="outline">Disconnected</Badge>
-                            )}
-                            <Button variant="outline" size="sm">
-                              {connections.some(c => c.provider === 'xero' && c.status === 'connected') ? 'Reconnect' : 'Connect'}
-                            </Button>
-                          </div>
+                          <Badge variant="secondary">
+                            Coming Soon
+                          </Badge>
                         </div>
                       </div>
                     </CardContent>
                   </Card>
                 )}
               </div>
-            </TabsContent>
-
-            <TabsContent value="account">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Account Settings</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600">Additional account settings coming soon.</p>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="billing">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Billing & Subscription</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600">Billing management coming soon.</p>
-                </CardContent>
-              </Card>
             </TabsContent>
           </Tabs>
         </div>
