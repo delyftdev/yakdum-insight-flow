@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,7 +5,8 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
-import { Building2, Users, UserPlus, Palette, Settings, CheckCircle } from 'lucide-react';
+import { Building2, Users, UserPlus, Palette, CheckCircle } from 'lucide-react';
+import ClientManagementStep from './ClientManagementStep';
 
 interface Props {
   onComplete: () => void;
@@ -26,8 +26,7 @@ const FirmOnboarding = ({ onComplete }: Props) => {
     services: [] as string[],
     teamEmails: [''],
     brandColor: '#3b82f6',
-    logoUploaded: false,
-    clientsImported: false
+    logoUploaded: false
   });
 
   const nextStep = () => {
@@ -278,71 +277,7 @@ const FirmOnboarding = ({ onComplete }: Props) => {
         );
 
       case 4:
-        return (
-          <div className="space-y-6 animate-fade-in">
-            <div className="text-center space-y-2">
-              <div className="mx-auto w-16 h-16 bg-gradient-to-r from-delyft-primary to-delyft-secondary rounded-full flex items-center justify-center mb-4">
-                <Settings className="w-8 h-8 text-white" />
-              </div>
-              <h2 className="text-2xl font-display font-semibold">Import your clients</h2>
-              <p className="text-gray-600">Get started with your existing client base</p>
-            </div>
-
-            <div className="grid gap-4">
-              <Card className="cursor-pointer transition-all border-2 hover:border-delyft-primary hover:shadow-md">
-                <CardContent className="p-6">
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h3 className="font-semibold">Import from CSV</h3>
-                      <Button variant="outline" size="sm">
-                        Upload File
-                      </Button>
-                    </div>
-                    <p className="text-sm text-gray-600">
-                      Upload a CSV file with client names, emails, and contact info
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="cursor-pointer transition-all border-2 hover:border-delyft-primary hover:shadow-md">
-                <CardContent className="p-6">
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h3 className="font-semibold">Add manually</h3>
-                      <Button variant="outline" size="sm">
-                        Add Client
-                      </Button>
-                    </div>
-                    <p className="text-sm text-gray-600">
-                      Start fresh and add clients one by one
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Button 
-                variant="ghost" 
-                onClick={() => setData(prev => ({ ...prev, clientsImported: true }))}
-                className="text-delyft-primary"
-              >
-                Skip for now - I'll add clients later
-              </Button>
-            </div>
-
-            <div className="flex gap-3">
-              <Button variant="outline" onClick={prevStep} className="flex-1">
-                Back
-              </Button>
-              <Button 
-                onClick={nextStep}
-                className="flex-1"
-              >
-                Continue
-              </Button>
-            </div>
-          </div>
-        );
+        return <ClientManagementStep onNext={nextStep} onPrev={prevStep} />;
 
       case 5:
         return (

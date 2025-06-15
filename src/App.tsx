@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Chat from "./pages/Chat";
 import Onboarding from "./pages/Onboarding";
+import SetupCompletion from "./pages/SetupCompletion";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -70,6 +71,11 @@ const AppRoutes = () => {
       <Route path="/chat" element={
         <ProtectedRoute>
           <Chat />
+        </ProtectedRoute>
+      } />
+      <Route path="/setup-completion" element={
+        <ProtectedRoute>
+          <SetupCompletion />
         </ProtectedRoute>
       } />
       <Route path="*" element={<NotFound />} />

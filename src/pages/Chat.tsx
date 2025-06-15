@@ -5,11 +5,12 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { supabase } from '@/integrations/supabase/client';
-import { Send, LogOut, User } from 'lucide-react';
+import { Send } from 'lucide-react';
 import Logo from '@/components/Logo';
+import CollapsiblePanel from '@/components/navigation/CollapsiblePanel';
+import ClientSelector from '@/components/chat/ClientSelector';
 
 interface Message {
   id: string;
@@ -26,12 +27,20 @@ interface UserProfile {
   email: string;
 }
 
+interface Client {
+  id: string;
+  name: string;
+  email: string;
+  business_type: string;
+}
+
 const Chat = () => {
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -41,17 +50,20 @@ const Chat = () => {
     }
 
     fetchUserProfile();
-    
-    // Add welcome message
-    setMessages([
-      {
+  }, [user, navigate]);
+
+  useEffect(() => {
+    // Update welcome message when client selection changes
+    if (userProfile) {
+      const welcomeMessage = getWelcomeMessage();
+      setMessages([{
         id: '1',
-        content: `Welcome to Delyft.ai! I'm your AI accounting assistant. I can help you analyze your financial data, answer questions about your business finances, and provide insights. What would you like to know?`,
+        content: welcomeMessage,
         sender: 'ai',
         timestamp: new Date()
-      }
-    ]);
-  }, [user, navigate]);
+      }]);
+    }
+  }, [selectedClient, userProfile]);
 
   const fetchUserProfile = async () => {
     if (!user) return;
@@ -69,6 +81,20 @@ const Chat = () => {
     }
   };
 
+  const getWelcomeMessage = () => {
+    if (!userProfile) return "Welcome to Delyft.ai!";
+
+    if (userProfile.user_type === 'accounting_firm') {
+      if (selectedClient) {
+        return `Welcome to Delyft.ai! I'm ready to help you analyze ${selectedClient.name}'s financial data. What would you like to know about their finances?`;
+      } else {
+        return `Welcome to Delyft.ai! I'm your AI accounting assistant for your firm. Select a client above to analyze their financial data, or I can help with general accounting questions. What would you like to know?`;
+      }
+    } else {
+      return `Welcome to Delyft.ai! I'm your AI accounting assistant. I can help you analyze your financial data, answer questions about your business finances, and provide insights. What would you like to know?`;
+    }
+  };
+
   const handleSendMessage = async () => {
     if (!inputMessage.trim()) return;
 
@@ -83,11 +109,21 @@ const Chat = () => {
     setInputMessage('');
     setIsLoading(true);
 
-    // Simulate AI response (you'll replace this with actual AI integration later)
+    // Simulate AI response with context awareness
     setTimeout(() => {
+      let aiResponse = `I understand you're asking about "${inputMessage}". `;
+      
+      if (userProfile?.user_type === 'accounting_firm' && selectedClient) {
+        aiResponse += `For ${selectedClient.name}, I'd be happy to help you analyze this. However, I notice you may need to ensure their accounting software is properly connected to provide accurate insights. Once connected, I can give you real-time analysis of their financial data.`;
+      } else if (userProfile?.user_type === 'accounting_firm' && !selectedClient) {
+        aiResponse += `As a firm admin, you can select a specific client above to get targeted insights, or I can help with general accounting practices and firm management questions.`;
+      } else {
+        aiResponse += `As your AI accounting assistant, I'd be happy to help you analyze this. However, I notice you may need to connect your accounting software first to provide accurate insights. Once connected, I can give you real-time analysis of your financial data.`;
+      }
+
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: `I understand you're asking about "${inputMessage}". As your AI accounting assistant, I'd be happy to help you analyze this. However, I notice you haven't connected your accounting software yet. To provide accurate insights, please connect QuickBooks Online or Xero first. Once connected, I can give you real-time analysis of your financial data.`,
+        content: aiResponse,
         sender: 'ai',
         timestamp: new Date()
       };
@@ -96,47 +132,25 @@ const Chat = () => {
     }, 1500);
   };
 
-  const handleSignOut = async () => {
-    await signOut();
-    navigate('/');
-  };
-
-  const getUserInitials = () => {
-    if (!userProfile) return 'U';
-    return `${userProfile.first_name?.[0] || ''}${userProfile.last_name?.[0] || ''}`.toUpperCase();
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-delyft-gray-50 via-white to-delyft-primary-light/20">
+      <CollapsiblePanel userProfile={userProfile} />
+      
       {/* Header */}
       <header className="border-b border-delyft-gray-200 bg-white/80 backdrop-blur-sm">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <Logo />
             
-            <div className="flex items-center space-x-4">
-              {userProfile && (
-                <div className="flex items-center space-x-3">
-                  <Avatar>
-                    <AvatarFallback className="bg-delyft-primary text-white">
-                      {getUserInitials()}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="hidden md:block">
-                    <p className="font-medium text-delyft-gray-900">
-                      {userProfile.first_name} {userProfile.last_name}
-                    </p>
-                    <p className="text-sm text-delyft-gray-600">
-                      {userProfile.user_type === 'accounting_firm' ? 'Accounting Firm' : 'Business Owner'}
-                    </p>
-                  </div>
-                </div>
-              )}
-              <Button variant="outline" onClick={handleSignOut} size="sm">
-                <LogOut className="w-4 h-4 mr-2" />
-                Sign Out
-              </Button>
-            </div>
+            {/* Client Selector for Firms */}
+            {userProfile?.user_type === 'accounting_firm' && (
+              <ClientSelector 
+                onClientSelect={setSelectedClient}
+                selectedClient={selectedClient}
+              />
+            )}
+            
+            <div className="w-[200px]"></div> {/* Spacer for balance */}
           </div>
         </div>
       </header>
@@ -151,6 +165,11 @@ const Chat = () => {
                   <span className="text-white font-bold text-sm">AI</span>
                 </div>
                 Delyft.ai Assistant
+                {selectedClient && (
+                  <span className="ml-3 text-sm font-normal text-delyft-gray-600">
+                    • {selectedClient.name}
+                  </span>
+                )}
               </CardTitle>
             </CardHeader>
             
@@ -199,7 +218,11 @@ const Chat = () => {
                 <Input
                   value={inputMessage}
                   onChange={(e) => setInputMessage(e.target.value)}
-                  placeholder="Ask me anything about your finances..."
+                  placeholder={
+                    selectedClient 
+                      ? `Ask me anything about ${selectedClient.name}'s finances...`
+                      : "Ask me anything about your finances..."
+                  }
                   onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                   disabled={isLoading}
                 />
