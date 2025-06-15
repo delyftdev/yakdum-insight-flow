@@ -22,14 +22,21 @@ Deno.serve(async (req) => {
   try {
     const { code, realmId, redirectUri, clientId } = await req.json();
 
-    console.log('OAuth exchange request:', { realmId, redirectUri, clientId });
+    console.log('OAuth exchange request:', { realmId, redirectUri, clientId, codePresent: !!code });
+
+    if (!code || !realmId || !redirectUri || !clientId) {
+      throw new Error('Missing required parameters: code, realmId, redirectUri, or clientId');
+    }
 
     const QBO_CLIENT_ID = Deno.env.get('QBO_CLIENT_ID');
     const QBO_CLIENT_SECRET = Deno.env.get('QBO_CLIENT_SECRET');
 
     if (!QBO_CLIENT_ID || !QBO_CLIENT_SECRET) {
+      console.error('QuickBooks credentials not configured');
       throw new Error('QuickBooks credentials not configured');
     }
+
+    console.log('Attempting token exchange with QuickBooks...');
 
     // Exchange authorization code for access token
     const tokenResponse = await fetch('https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer', {
@@ -49,7 +56,7 @@ Deno.serve(async (req) => {
     if (!tokenResponse.ok) {
       const errorText = await tokenResponse.text();
       console.error('Token exchange failed:', errorText);
-      throw new Error(`Token exchange failed: ${tokenResponse.statusText}`);
+      throw new Error(`Token exchange failed: ${tokenResponse.status} ${tokenResponse.statusText} - ${errorText}`);
     }
 
     const tokenData = await tokenResponse.json();
@@ -62,6 +69,8 @@ Deno.serve(async (req) => {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
+
+    console.log('Updating client record with OAuth tokens...');
 
     // Update the client record with OAuth tokens
     const { data, error } = await supabase
@@ -81,8 +90,10 @@ Deno.serve(async (req) => {
       throw new Error(`Database error: ${error.message}`);
     }
 
+    console.log('Database updated successfully');
+
     // Also update the accounting_connections table
-    await supabase
+    const { error: connError } = await supabase
       .from('accounting_connections')
       .upsert({
         client_id: clientId,
@@ -91,6 +102,11 @@ Deno.serve(async (req) => {
         connected_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       });
+
+    if (connError) {
+      console.error('Accounting connections error:', connError);
+      // Don't throw here as the main connection is done
+    }
 
     return new Response(
       JSON.stringify({ 
@@ -104,7 +120,10 @@ Deno.serve(async (req) => {
   } catch (error) {
     console.error('OAuth exchange error:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message || 'OAuth exchange failed',
+        details: error.toString()
+      }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

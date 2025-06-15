@@ -5,63 +5,44 @@ import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
+import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Building2, User } from 'lucide-react';
-
-interface OnboardingData {
-  userType: 'individual' | 'accounting_firm' | '';
-  firstName: string;
-  lastName: string;
-  companyName: string;
-  email: string;
-  phone: string;
-  password: string;
-  confirmPassword: string;
-}
+import { User, Building, Check } from 'lucide-react';
 
 const OnboardingFlow = () => {
   const [step, setStep] = useState(1);
+  const [userType, setUserType] = useState<'individual' | 'accounting_firm'>('individual');
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    companyName: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+  });
   const [isLoading, setIsLoading] = useState(false);
   const { signUp } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const [data, setData] = useState<OnboardingData>({
-    userType: '',
-    firstName: '',
-    lastName: '',
-    companyName: '',
-    email: '',
-    phone: '',
-    password: '',
-    confirmPassword: ''
-  });
-
-  const totalSteps = 3;
-  const progress = (step / totalSteps) * 100;
-
-  const updateData = (field: keyof OnboardingData, value: string) => {
-    setData(prev => ({ ...prev, [field]: value }));
+  const handleUserTypeSelect = (type: 'individual' | 'accounting_firm') => {
+    setUserType(type);
+    setStep(2);
   };
 
-  const nextStep = () => {
-    if (step < totalSteps) {
-      setStep(step + 1);
-    }
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
-  const prevStep = () => {
-    if (step > 1) {
-      setStep(step - 1);
-    }
-  };
-
-  const handleSubmit = async () => {
-    if (data.password !== data.confirmPassword) {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (formData.password !== formData.confirmPassword) {
       toast({
-        title: "Error",
+        title: "Password mismatch",
         description: "Passwords do not match",
         variant: "destructive"
       });
@@ -70,15 +51,12 @@ const OnboardingFlow = () => {
 
     setIsLoading(true);
 
-    const userData = {
-      first_name: data.firstName,
-      last_name: data.lastName,
-      company_name: data.companyName,
-      user_type: data.userType,
-      phone: data.phone
-    };
-
-    const { error } = await signUp(data.email, data.password, userData);
+    const { error } = await signUp(formData.email, formData.password, {
+      first_name: formData.firstName,
+      last_name: formData.lastName,
+      company_name: formData.companyName,
+      user_type: userType
+    });
 
     if (error) {
       toast({
@@ -89,226 +67,180 @@ const OnboardingFlow = () => {
     } else {
       toast({
         title: "Success!",
-        description: "Please check your email to confirm your account"
+        description: "Please check your email to verify your account",
       });
-      navigate('/');
+      navigate('/auth');
     }
 
     setIsLoading(false);
   };
 
-  const renderStep = () => {
-    switch (step) {
-      case 1:
-        return (
-          <div className="space-y-6 animate-fade-in">
-            <div className="text-center space-y-2">
-              <h2 className="text-2xl font-display font-semibold">Choose your account type</h2>
-              <p className="text-gray-600">Tell us how you'll be using Delyft.ai</p>
-            </div>
-            
-            <div className="grid gap-4">
-              <Card 
-                className={`cursor-pointer transition-all border-2 hover:shadow-md ${
-                  data.userType === 'individual' ? 'border-delyft-primary bg-delyft-primary/5' : 'border-gray-200'
-                }`}
-                onClick={() => updateData('userType', 'individual')}
-              >
-                <CardContent className="p-6">
-                  <div className="flex items-center space-x-4">
-                    <div className={`p-3 rounded-lg ${
-                      data.userType === 'individual' ? 'bg-delyft-primary text-white' : 'bg-gray-100'
-                    }`}>
-                      <User className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold">Individual Business Owner</h3>
-                      <p className="text-sm text-gray-600">I own and manage my own business</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+  if (step === 1) {
+    return (
+      <div className="space-y-6 animate-fade-in">
+        <div className="text-center space-y-2">
+          <h2 className="text-2xl font-display font-semibold">Choose your account type</h2>
+          <p className="text-gray-600">Select the option that best describes you</p>
+        </div>
 
-              <Card 
-                className={`cursor-pointer transition-all border-2 hover:shadow-md ${
-                  data.userType === 'accounting_firm' ? 'border-delyft-primary bg-delyft-primary/5' : 'border-gray-200'
-                }`}
-                onClick={() => updateData('userType', 'accounting_firm')}
-              >
-                <CardContent className="p-6">
-                  <div className="flex items-center space-x-4">
-                    <div className={`p-3 rounded-lg ${
-                      data.userType === 'accounting_firm' ? 'bg-delyft-primary text-white' : 'bg-gray-100'
-                    }`}>
-                      <Building2 className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold">Accounting Firm</h3>
-                      <p className="text-sm text-gray-600">I provide accounting services to clients</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            <Button 
-              onClick={nextStep} 
-              disabled={!data.userType}
-              className="w-full h-12"
-            >
-              Continue
-            </Button>
-          </div>
-        );
-
-      case 2:
-        return (
-          <div className="space-y-6 animate-fade-in">
-            <div className="text-center space-y-2">
-              <h2 className="text-2xl font-display font-semibold">Tell us about yourself</h2>
-              <p className="text-gray-600">We'll use this information to personalize your experience</p>
-            </div>
-
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="firstName">First Name</Label>
-                  <Input
-                    id="firstName"
-                    value={data.firstName}
-                    onChange={(e) => updateData('firstName', e.target.value)}
-                    className="border-gray-300 focus:border-delyft-primary"
-                    required
-                  />
+        <div className="grid gap-4">
+          <Card 
+            className={`cursor-pointer transition-all duration-200 hover:shadow-md border-2 ${
+              userType === 'individual' ? 'border-gray-900 bg-gray-50' : 'border-gray-200 hover:border-gray-300'
+            }`}
+            onClick={() => setUserType('individual')}
+          >
+            <CardContent className="p-6">
+              <div className="flex items-center space-x-4">
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                  userType === 'individual' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600'
+                }`}>
+                  <User className="w-6 h-6" />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="lastName">Last Name</Label>
-                  <Input
-                    id="lastName"
-                    value={data.lastName}
-                    onChange={(e) => updateData('lastName', e.target.value)}
-                    className="border-gray-300 focus:border-delyft-primary"
-                    required
-                  />
+                <div className="flex-1">
+                  <h3 className="font-semibold text-gray-900">Individual Business Owner</h3>
+                  <p className="text-sm text-gray-600">
+                    I manage my own business finances
+                  </p>
                 </div>
+                {userType === 'individual' && (
+                  <Check className="w-5 h-5 text-gray-900" />
+                )}
               </div>
+            </CardContent>
+          </Card>
 
-              <div className="space-y-2">
-                <Label htmlFor="companyName">
-                  {data.userType === 'accounting_firm' ? 'Firm Name' : 'Company Name'}
-                </Label>
-                <Input
-                  id="companyName"
-                  value={data.companyName}
-                  onChange={(e) => updateData('companyName', e.target.value)}
-                  className="border-gray-300 focus:border-delyft-primary"
-                />
+          <Card 
+            className={`cursor-pointer transition-all duration-200 hover:shadow-md border-2 ${
+              userType === 'accounting_firm' ? 'border-gray-900 bg-gray-50' : 'border-gray-200 hover:border-gray-300'
+            }`}
+            onClick={() => setUserType('accounting_firm')}
+          >
+            <CardContent className="p-6">
+              <div className="flex items-center space-x-4">
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                  userType === 'accounting_firm' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600'
+                }`}>
+                  <Building className="w-6 h-6" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-gray-900">Accounting Firm</h3>
+                  <p className="text-sm text-gray-600">
+                    I manage finances for multiple clients
+                  </p>
+                </div>
+                {userType === 'accounting_firm' && (
+                  <Check className="w-5 h-5 text-gray-900" />
+                )}
               </div>
+            </CardContent>
+          </Card>
+        </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="email">Email Address</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={data.email}
-                  onChange={(e) => updateData('email', e.target.value)}
-                  className="border-gray-300 focus:border-delyft-primary"
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="phone">Phone Number (Optional)</Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  value={data.phone}
-                  onChange={(e) => updateData('phone', e.target.value)}
-                  className="border-gray-300 focus:border-delyft-primary"
-                />
-              </div>
-            </div>
-
-            <div className="flex gap-3">
-              <Button variant="outline" onClick={prevStep} className="flex-1">
-                Back
-              </Button>
-              <Button 
-                onClick={nextStep}
-                disabled={!data.firstName || !data.lastName || !data.email}
-                className="flex-1"
-              >
-                Continue
-              </Button>
-            </div>
-          </div>
-        );
-
-      case 3:
-        return (
-          <div className="space-y-6 animate-fade-in">
-            <div className="text-center space-y-2">
-              <h2 className="text-2xl font-display font-semibold">Secure your account</h2>
-              <p className="text-gray-600">Create a strong password to protect your data</p>
-            </div>
-
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={data.password}
-                  onChange={(e) => updateData('password', e.target.value)}
-                  className="border-gray-300 focus:border-delyft-primary"
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm Password</Label>
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  value={data.confirmPassword}
-                  onChange={(e) => updateData('confirmPassword', e.target.value)}
-                  className="border-gray-300 focus:border-delyft-primary"
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="flex gap-3">
-              <Button variant="outline" onClick={prevStep} className="flex-1">
-                Back
-              </Button>
-              <Button 
-                onClick={handleSubmit}
-                disabled={!data.password || !data.confirmPassword || isLoading}
-                className="flex-1"
-              >
-                {isLoading ? "Creating account..." : "Create Account"}
-              </Button>
-            </div>
-          </div>
-        );
-
-      default:
-        return null;
-    }
-  };
+        <Button 
+          onClick={() => handleUserTypeSelect(userType)} 
+          className="w-full h-12"
+        >
+          Continue
+        </Button>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-2">
-        <div className="flex justify-between text-sm text-gray-600">
-          <span>Step {step} of {totalSteps}</span>
-          <span>{Math.round(progress)}% complete</span>
-        </div>
-        <Progress value={progress} className="h-2" />
+    <div className="space-y-6 animate-fade-in">
+      <div className="text-center space-y-2">
+        <h2 className="text-2xl font-display font-semibold">Create your account</h2>
+        <p className="text-gray-600">
+          {userType === 'individual' 
+            ? 'Set up your Yakdum account' 
+            : 'Set up your firm\'s Yakdum account'
+          }
+        </p>
       </div>
-      
-      {renderStep()}
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="firstName">First Name</Label>
+            <Input
+              id="firstName"
+              value={formData.firstName}
+              onChange={(e) => handleInputChange('firstName', e.target.value)}
+              className="border-gray-300 focus:border-gray-500"
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="lastName">Last Name</Label>
+            <Input
+              id="lastName"
+              value={formData.lastName}
+              onChange={(e) => handleInputChange('lastName', e.target.value)}
+              className="border-gray-300 focus:border-gray-500"
+              required
+            />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="companyName">
+            {userType === 'individual' ? 'Business Name' : 'Firm Name'}
+          </Label>
+          <Input
+            id="companyName"
+            value={formData.companyName}
+            onChange={(e) => handleInputChange('companyName', e.target.value)}
+            className="border-gray-300 focus:border-gray-500"
+            required
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="email">Email Address</Label>
+          <Input
+            id="email"
+            type="email"
+            value={formData.email}
+            onChange={(e) => handleInputChange('email', e.target.value)}
+            className="border-gray-300 focus:border-gray-500"
+            required
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="password">Password</Label>
+          <Input
+            id="password"
+            type="password"
+            value={formData.password}
+            onChange={(e) => handleInputChange('password', e.target.value)}
+            className="border-gray-300 focus:border-gray-500"
+            required
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="confirmPassword">Confirm Password</Label>
+          <Input
+            id="confirmPassword"
+            type="password"
+            value={formData.confirmPassword}
+            onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+            className="border-gray-300 focus:border-gray-500"
+            required
+          />
+        </div>
+
+        <div className="flex space-x-4">
+          <Button type="button" variant="outline" onClick={() => setStep(1)} className="flex-1">
+            Back
+          </Button>
+          <Button type="submit" className="flex-1" disabled={isLoading}>
+            {isLoading ? "Creating account..." : "Create Account"}
+          </Button>
+        </div>
+      </form>
     </div>
   );
 };

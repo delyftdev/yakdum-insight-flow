@@ -36,7 +36,7 @@ const Auth = () => {
               <p className="text-gray-600">
                 {mode === 'signin' 
                   ? 'AI-powered accounting insights that work for you' 
-                  : 'Create your Delyft.ai account in minutes'
+                  : 'Create your Yakdum account in minutes'
                 }
               </p>
             </div>
@@ -49,7 +49,7 @@ const Auth = () => {
               <Button
                 variant="ghost"
                 onClick={() => setMode(mode === 'signin' ? 'signup' : 'signin')}
-                className="text-sm text-gray-600 hover:text-delyft-primary"
+                className="text-sm text-gray-600 hover:text-gray-800"
               >
                 {mode === 'signin' 
                   ? "Don't have an account? Sign up" 

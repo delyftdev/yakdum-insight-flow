@@ -36,11 +36,6 @@ const SignInForm = () => {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <div className="text-center space-y-2">
-        <h2 className="text-2xl font-display font-semibold">Welcome back</h2>
-        <p className="text-gray-600">Sign in to your Delyft.ai account</p>
-      </div>
-
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="email">Email Address</Label>
@@ -49,7 +44,7 @@ const SignInForm = () => {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="border-gray-300 focus:border-delyft-primary"
+            className="border-gray-300 focus:border-gray-500"
             required
           />
         </div>
@@ -61,7 +56,7 @@ const SignInForm = () => {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="border-gray-300 focus:border-delyft-primary"
+            className="border-gray-300 focus:border-gray-500"
             required
           />
         </div>
