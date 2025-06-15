@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
@@ -62,15 +61,22 @@ const SetupCompletion = () => {
     if (!user) return;
 
     try {
-      // Fetch user profile
+      // Fetch user profile with logo_url
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
-        .select('*')
+        .select('id, first_name, last_name, email, company_name, phone, user_type, onboarding_completed, logo_url')
         .eq('id', user.id)
         .single();
 
       if (profileError) throw profileError;
-      setUserProfile(profile);
+      
+      // Ensure logo_url is included even if null
+      const profileWithLogo = {
+        ...profile,
+        logo_url: profile.logo_url || ''
+      };
+      
+      setUserProfile(profileWithLogo);
 
       // Fetch clients if accounting firm
       if (profile.user_type === 'accounting_firm') {
