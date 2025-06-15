@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, CheckCircle2, AlertCircle, Settings, User, Palette, CreditCard, Link2 } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Settings, User, Palette, CreditCard, Link2, Upload, Building2 } from 'lucide-react';
 import CollapsiblePanel from '@/components/navigation/CollapsiblePanel';
 
 interface UserProfile {
@@ -22,6 +22,7 @@ interface UserProfile {
   phone: string;
   user_type: 'individual' | 'accounting_firm';
   onboarding_completed: boolean;
+  logo_url: string;
 }
 
 interface Client {
@@ -47,6 +48,7 @@ const SetupCompletion = () => {
   const [clients, setClients] = useState<Client[]>([]);
   const [connections, setConnections] = useState<Connection[]>([]);
   const [loading, setLoading] = useState(true);
+  const [brandColor, setBrandColor] = useState('#000000');
 
   useEffect(() => {
     if (!user) {
@@ -149,7 +151,7 @@ const SetupCompletion = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-delyft-primary"></div>
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-black"></div>
       </div>
     );
   }
@@ -157,7 +159,7 @@ const SetupCompletion = () => {
   if (!userProfile) return null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-delyft-gray-50 via-white to-delyft-primary-light/20">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
       <CollapsiblePanel userProfile={userProfile} />
       
       <div className="container mx-auto px-6 py-8">
@@ -169,8 +171,8 @@ const SetupCompletion = () => {
               Back to Chat
             </Button>
             <div className="flex-1">
-              <h1 className="text-3xl font-display font-bold text-delyft-gray-900">Setup Completion</h1>
-              <p className="text-delyft-gray-600 mt-1">Manage your account settings and integrations</p>
+              <h1 className="text-3xl font-display font-bold text-gray-900">Setup Completion</h1>
+              <p className="text-gray-600 mt-1">Manage your account settings and integrations</p>
             </div>
             <div className="flex items-center space-x-2">
               <CheckCircle2 className="w-5 h-5 text-green-500" />
@@ -260,94 +262,100 @@ const SetupCompletion = () => {
               </Card>
             </TabsContent>
 
-            <TabsContent value="integrations">
+            <TabsContent value="appearance">
               <div className="space-y-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Accounting Software Connections</CardTitle>
+                    <CardTitle>Brand Customization</CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {/* QuickBooks Online */}
-                      <div className="flex items-center justify-between p-4 border rounded-lg">
-                        <div className="flex items-center space-x-4">
-                          <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                            <span className="text-green-600 font-bold">QB</span>
+                  <CardContent className="space-y-6">
+                    <div className="space-y-3">
+                      <Label>Company Logo</Label>
+                      <div className="flex items-center space-x-4">
+                        {userProfile.logo_url ? (
+                          <img src={userProfile.logo_url} alt="Company Logo" className="w-16 h-16 rounded-lg object-cover border" />
+                        ) : (
+                          <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
+                            <Building2 className="w-8 h-8 text-gray-400" />
                           </div>
-                          <div>
-                            <h3 className="font-semibold">QuickBooks Online</h3>
-                            <p className="text-sm text-gray-600">Cloud-based accounting</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center space-x-3">
-                          {connections.some(c => c.provider === 'quickbooks' && c.status === 'connected') ? (
-                            <Badge variant="secondary" className="bg-green-100 text-green-700">
-                              Connected
-                            </Badge>
-                          ) : (
-                            <Badge variant="outline">Disconnected</Badge>
-                          )}
-                          <Button variant="outline" size="sm">
-                            {connections.some(c => c.provider === 'quickbooks' && c.status === 'connected') ? 'Reconnect' : 'Connect'}
-                          </Button>
-                        </div>
+                        )}
+                        <Button variant="outline">
+                          <Upload className="w-4 h-4 mr-2" />
+                          Upload New Logo
+                        </Button>
                       </div>
-
-                      {/* Xero */}
-                      <div className="flex items-center justify-between p-4 border rounded-lg">
-                        <div className="flex items-center space-x-4">
-                          <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                            <span className="text-blue-600 font-bold">X</span>
-                          </div>
-                          <div>
-                            <h3 className="font-semibold">Xero</h3>
-                            <p className="text-sm text-gray-600">Beautiful business accounting</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center space-x-3">
-                          {connections.some(c => c.provider === 'xero' && c.status === 'connected') ? (
-                            <Badge variant="secondary" className="bg-green-100 text-green-700">
-                              Connected
-                            </Badge>
-                          ) : (
-                            <Badge variant="outline">Disconnected</Badge>
-                          )}
-                          <Button variant="outline" size="sm">
-                            {connections.some(c => c.provider === 'xero' && c.status === 'connected') ? 'Reconnect' : 'Connect'}
-                          </Button>
-                        </div>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <Label>Brand Color</Label>
+                      <div className="flex items-center space-x-4">
+                        <input
+                          type="color"
+                          value={brandColor}
+                          onChange={(e) => setBrandColor(e.target.value)}
+                          className="w-12 h-12 rounded-lg border-2 border-gray-300"
+                        />
+                        <Input
+                          value={brandColor}
+                          onChange={(e) => setBrandColor(e.target.value)}
+                          placeholder="#000000"
+                          className="flex-1"
+                        />
+                        <Button onClick={() => updateProfile({ logo_url: brandColor })}>Save</Button>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
+              </div>
+            </TabsContent>
 
-                {/* Client Connections (for firms) */}
-                {userProfile.user_type === 'accounting_firm' && clients.length > 0 && (
+            <TabsContent value="integrations">
+              <div className="space-y-6">
+                {userProfile.user_type === 'accounting_firm' && clients.length > 0 ? (
                   <Card>
                     <CardHeader>
-                      <CardTitle>Client Connections</CardTitle>
+                      <CardTitle>Client Ledger Connections</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <div className="space-y-3">
+                      <div className="space-y-4">
                         {clients.map(client => {
                           const clientConnections = connections.filter(c => c.client?.id === client.id);
                           return (
-                            <div key={client.id} className="flex items-center justify-between p-3 border rounded-lg">
-                              <div>
-                                <h4 className="font-medium">{client.name}</h4>
-                                <p className="text-sm text-gray-600">{client.email}</p>
+                            <div key={client.id} className="p-4 border border-gray-200 rounded-lg">
+                              <div className="flex items-center justify-between mb-3">
+                                <div>
+                                  <h4 className="font-semibold text-gray-900">{client.name}</h4>
+                                  <p className="text-sm text-gray-600">{client.email}</p>
+                                </div>
+                                <Badge variant={clientConnections.length > 0 ? "default" : "outline"}>
+                                  {clientConnections.length > 0 ? "Connected" : "Not Connected"}
+                                </Badge>
                               </div>
-                              <div className="flex items-center space-x-2">
-                                {clientConnections.length > 0 ? (
-                                  <div className="flex items-center space-x-2">
-                                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                                    <span className="text-sm text-green-600">
-                                      Connected to {clientConnections[0].provider}
-                                    </span>
+                              
+                              <div className="grid grid-cols-2 gap-3">
+                                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                  <div className="flex items-center space-x-3">
+                                    <div className="w-8 h-8 bg-green-100 rounded flex items-center justify-center">
+                                      <span className="text-green-600 font-bold text-xs">QB</span>
+                                    </div>
+                                    <span className="text-sm font-medium">QuickBooks</span>
                                   </div>
-                                ) : (
-                                  <Badge variant="outline">No connections</Badge>
-                                )}
+                                  <Badge variant={clientConnections.some(c => c.provider === 'quickbooks') ? "default" : "outline"} className="text-xs">
+                                    {clientConnections.some(c => c.provider === 'quickbooks') ? "Connected" : "Connect"}
+                                  </Badge>
+                                </div>
+                                
+                                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                  <div className="flex items-center space-x-3">
+                                    <div className="w-8 h-8 bg-blue-100 rounded flex items-center justify-center">
+                                      <span className="text-blue-600 font-bold text-xs">X</span>
+                                    </div>
+                                    <span className="text-sm font-medium">Xero</span>
+                                  </div>
+                                  <Badge variant={clientConnections.some(c => c.provider === 'xero') ? "default" : "outline"} className="text-xs">
+                                    {clientConnections.some(c => c.provider === 'xero') ? "Connected" : "Connect"}
+                                  </Badge>
+                                </div>
                               </div>
                             </div>
                           );
@@ -355,19 +363,67 @@ const SetupCompletion = () => {
                       </div>
                     </CardContent>
                   </Card>
+                ) : (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Accounting Software Connections</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        {/* QuickBooks Online */}
+                        <div className="flex items-center justify-between p-4 border rounded-lg">
+                          <div className="flex items-center space-x-4">
+                            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                              <span className="text-green-600 font-bold">QB</span>
+                            </div>
+                            <div>
+                              <h3 className="font-semibold">QuickBooks Online</h3>
+                              <p className="text-sm text-gray-600">Cloud-based accounting</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center space-x-3">
+                            {connections.some(c => c.provider === 'quickbooks' && c.status === 'connected') ? (
+                              <Badge className="bg-green-100 text-green-700">
+                                Connected
+                              </Badge>
+                            ) : (
+                              <Badge variant="outline">Disconnected</Badge>
+                            )}
+                            <Button variant="outline" size="sm">
+                              {connections.some(c => c.provider === 'quickbooks' && c.status === 'connected') ? 'Reconnect' : 'Connect'}
+                            </Button>
+                          </div>
+                        </div>
+
+                        {/* Xero */}
+                        <div className="flex items-center justify-between p-4 border rounded-lg">
+                          <div className="flex items-center space-x-4">
+                            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                              <span className="text-blue-600 font-bold">X</span>
+                            </div>
+                            <div>
+                              <h3 className="font-semibold">Xero</h3>
+                              <p className="text-sm text-gray-600">Beautiful business accounting</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center space-x-3">
+                            {connections.some(c => c.provider === 'xero' && c.status === 'connected') ? (
+                              <Badge className="bg-green-100 text-green-700">
+                                Connected
+                              </Badge>
+                            ) : (
+                              <Badge variant="outline">Disconnected</Badge>
+                            )}
+                            <Button variant="outline" size="sm">
+                              {connections.some(c => c.provider === 'xero' && c.status === 'connected') ? 'Reconnect' : 'Connect'}
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                 )}
               </div>
-            </TabsContent>
-
-            <TabsContent value="appearance">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Appearance Settings</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600">Appearance customization options coming soon.</p>
-                </CardContent>
-              </Card>
             </TabsContent>
 
             <TabsContent value="account">

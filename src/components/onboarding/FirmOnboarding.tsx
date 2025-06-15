@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,7 +26,7 @@ const FirmOnboarding = ({ onComplete }: Props) => {
     clientCount: '',
     services: [] as string[],
     teamEmails: [''],
-    brandColor: '#3b82f6',
+    brandColor: '#000000',
     logoUploaded: false
   });
 
@@ -67,7 +68,7 @@ const FirmOnboarding = ({ onComplete }: Props) => {
     // Simulate API call to save onboarding data
     setTimeout(() => {
       toast({
-        title: "Welcome to Delyft.ai for Firms!",
+        title: "Welcome to Yakdum for Firms!",
         description: "Your firm dashboard is ready. Start managing clients with AI insights."
       });
       onComplete();
@@ -80,11 +81,11 @@ const FirmOnboarding = ({ onComplete }: Props) => {
         return (
           <div className="space-y-6 animate-fade-in">
             <div className="text-center space-y-2">
-              <div className="mx-auto w-16 h-16 bg-gradient-to-r from-delyft-primary to-delyft-secondary rounded-full flex items-center justify-center mb-4">
+              <div className="mx-auto w-16 h-16 bg-gradient-to-r from-black to-gray-800 rounded-full flex items-center justify-center mb-4">
                 <Building2 className="w-8 h-8 text-white" />
               </div>
               <h2 className="text-2xl font-display font-semibold">Tell us about your firm</h2>
-              <p className="text-gray-600">Help us customize Delyft.ai for your practice</p>
+              <p className="text-gray-600">Help us customize Yakdum for your practice</p>
             </div>
 
             <div className="space-y-4">
@@ -93,7 +94,7 @@ const FirmOnboarding = ({ onComplete }: Props) => {
                   <Label htmlFor="firmSize">Firm Size</Label>
                   <select
                     id="firmSize"
-                    className="flex h-10 w-full rounded-md border border-gray-300 bg-background px-3 py-2 text-sm"
+                    className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-black focus:ring-1 focus:ring-black"
                     value={data.firmSize}
                     onChange={(e) => setData(prev => ({ ...prev, firmSize: e.target.value }))}
                   >
@@ -109,7 +110,7 @@ const FirmOnboarding = ({ onComplete }: Props) => {
                   <Label htmlFor="clientCount">Client Count</Label>
                   <select
                     id="clientCount"
-                    className="flex h-10 w-full rounded-md border border-gray-300 bg-background px-3 py-2 text-sm"
+                    className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-black focus:ring-1 focus:ring-black"
                     value={data.clientCount}
                     onChange={(e) => setData(prev => ({ ...prev, clientCount: e.target.value }))}
                   >
@@ -124,7 +125,7 @@ const FirmOnboarding = ({ onComplete }: Props) => {
 
               <div className="space-y-3">
                 <Label>Services you provide (select all that apply)</Label>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-3">
                   {[
                     'Bookkeeping',
                     'Tax Preparation',
@@ -133,15 +134,15 @@ const FirmOnboarding = ({ onComplete }: Props) => {
                     'Business Consulting',
                     'Audit & Assurance'
                   ].map((service) => (
-                    <div key={service} className="flex items-center space-x-2">
+                    <div key={service} className="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
                       <input
                         type="checkbox"
                         id={service}
                         checked={data.services.includes(service)}
                         onChange={() => toggleService(service)}
-                        className="rounded border-gray-300"
+                        className="h-4 w-4 text-black border-gray-300 rounded focus:ring-black focus:ring-2"
                       />
-                      <Label htmlFor={service} className="text-sm">{service}</Label>
+                      <Label htmlFor={service} className="text-sm font-medium cursor-pointer">{service}</Label>
                     </div>
                   ))}
                 </div>
@@ -162,11 +163,11 @@ const FirmOnboarding = ({ onComplete }: Props) => {
         return (
           <div className="space-y-6 animate-fade-in">
             <div className="text-center space-y-2">
-              <div className="mx-auto w-16 h-16 bg-gradient-to-r from-delyft-primary to-delyft-secondary rounded-full flex items-center justify-center mb-4">
+              <div className="mx-auto w-16 h-16 bg-gradient-to-r from-black to-gray-800 rounded-full flex items-center justify-center mb-4">
                 <Users className="w-8 h-8 text-white" />
               </div>
               <h2 className="text-2xl font-display font-semibold">Invite your team</h2>
-              <p className="text-gray-600">Add team members who will use Delyft.ai</p>
+              <p className="text-gray-600">Add team members who will use Yakdum</p>
             </div>
 
             <div className="space-y-4">
@@ -179,7 +180,7 @@ const FirmOnboarding = ({ onComplete }: Props) => {
                     onChange={(e) => updateTeamEmail(index, e.target.value)}
                     className="flex-1"
                   />
-                  <select className="h-10 border border-gray-300 rounded-md px-3 text-sm">
+                  <select className="h-10 border border-gray-300 rounded-md px-3 text-sm bg-white focus:border-black focus:ring-1 focus:ring-black">
                     <option value="user">User</option>
                     <option value="admin">Admin</option>
                   </select>
@@ -211,7 +212,7 @@ const FirmOnboarding = ({ onComplete }: Props) => {
         return (
           <div className="space-y-6 animate-fade-in">
             <div className="text-center space-y-2">
-              <div className="mx-auto w-16 h-16 bg-gradient-to-r from-delyft-primary to-delyft-secondary rounded-full flex items-center justify-center mb-4">
+              <div className="mx-auto w-16 h-16 bg-gradient-to-r from-black to-gray-800 rounded-full flex items-center justify-center mb-4">
                 <Palette className="w-8 h-8 text-white" />
               </div>
               <h2 className="text-2xl font-display font-semibold">Brand your workspace</h2>
@@ -221,7 +222,7 @@ const FirmOnboarding = ({ onComplete }: Props) => {
             <div className="space-y-6">
               <div className="space-y-3">
                 <Label>Upload your firm logo</Label>
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 transition-colors">
                   <div className="space-y-2">
                     <div className="mx-auto w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
                       <Building2 className="w-6 h-6 text-gray-400" />
@@ -252,13 +253,13 @@ const FirmOnboarding = ({ onComplete }: Props) => {
                     type="color"
                     value={data.brandColor}
                     onChange={(e) => setData(prev => ({ ...prev, brandColor: e.target.value }))}
-                    className="w-12 h-12 rounded-lg border border-gray-300"
+                    className="w-12 h-12 rounded-lg border-2 border-gray-300"
                   />
                   <div className="flex-1">
                     <Input
                       value={data.brandColor}
                       onChange={(e) => setData(prev => ({ ...prev, brandColor: e.target.value }))}
-                      placeholder="#3b82f6"
+                      placeholder="#000000"
                     />
                   </div>
                 </div>
@@ -283,17 +284,17 @@ const FirmOnboarding = ({ onComplete }: Props) => {
         return (
           <div className="space-y-6 animate-fade-in">
             <div className="text-center space-y-4">
-              <div className="mx-auto w-20 h-20 bg-gradient-to-r from-delyft-primary to-delyft-secondary rounded-full flex items-center justify-center mb-6">
+              <div className="mx-auto w-20 h-20 bg-gradient-to-r from-black to-gray-800 rounded-full flex items-center justify-center mb-6">
                 <CheckCircle className="w-10 h-10 text-white" />
               </div>
               <h2 className="text-3xl font-display font-bold">Your firm is ready!</h2>
               <p className="text-gray-600 text-lg">Welcome to the future of accounting practice management</p>
             </div>
 
-            <Card className="bg-gradient-to-r from-delyft-primary/5 to-delyft-secondary/5 border-delyft-primary/20">
+            <Card className="bg-gradient-to-r from-gray-50 to-gray-100 border-gray-200">
               <CardContent className="p-6">
-                <h3 className="font-semibold mb-3 text-delyft-gray-900">What's next:</h3>
-                <ul className="space-y-2 text-sm text-delyft-gray-700">
+                <h3 className="font-semibold mb-3 text-gray-900">What's next:</h3>
+                <ul className="space-y-2 text-sm text-gray-700">
                   <li className="flex items-center space-x-2">
                     <CheckCircle className="w-4 h-4 text-green-500" />
                     <span>Connect client QuickBooks and Xero accounts</span>
