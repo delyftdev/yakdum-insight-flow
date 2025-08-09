@@ -121,7 +121,7 @@ const Contact = () => {
                   </div>
                   <div className="text-gray-600 space-y-1">
                     <p>Yakdum Technologies Inc.</p>
-                    <p>1234 Innovation Drive, Suite 500</p>
+                    <p>1234 Innovation Drive, Suite 501</p>
                     <p>San Francisco, CA 94105</p>
                     <p>United States</p>
                   </div>
